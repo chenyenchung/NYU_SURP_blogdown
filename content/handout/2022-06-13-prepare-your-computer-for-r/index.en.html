@@ -1,0 +1,188 @@
+---
+title: Prepare your computer for R
+author: "Cass"
+date: '2022-06-13'
+slug: prepare-your-computer-for-r
+categories:
+  - Handout
+output: 
+  html_document: 
+    toc: yes
+    code_folding: show
+tags: []
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2022-06-13T20:38:45-04:00'
+featured: yes
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+
+
+<div id="agenda" class="section level2">
+<h2>AGENDA</h2>
+<ol style="list-style-type: decimal">
+<li>Introductions</li>
+<li>Installing R</li>
+<li>This Worksheet :)</li>
+</ol>
+<blockquote>
+<p>Adpated from material curated by Eugene Plavskin and Grace Avecilla</p>
+</blockquote>
+<ul>
+<li><a href="https://nyusurp.github.io/">Go back to syllabus</a></li>
+<li><a href="https://nyusurp.github.io/slide/session_1_environment.ppt">The slide deck for the session</a></li>
+<li><a href="session_1_environment.Rmd">Link to this worksheet</a> (Right-click -&gt; download linked file)</li>
+<li><a href="../solution/session_1_environment.html">Solution to this worksheet</a></li>
+</ul>
+</div>
+<div id="exploring-rstudio" class="section level2">
+<h2>Exploring RStudio</h2>
+<ul>
+<li>The console: Where you run commands one by one (bottom)</li>
+<li>The environment: Where you can see what is loaded in R (upper right)</li>
+<li>The file explorer: An easier way for you to find files (otherwise you’ll need to know the <em>path</em> of a file to use it in R; lower right)</li>
+</ul>
+</div>
+<div id="installing-packages" class="section level2">
+<h2>Installing <em>packages</em></h2>
+<ul>
+<li><p>Packages are like kits in experiments: They <em>package</em> the reagents and instructions for otherwise complicated processes for you.</p></li>
+<li><p>We’ll be installing 3 packages today</p>
+<ul>
+<li><a href="https://rmarkdown.rstudio.com">rmarkdown</a>: A tool that allows you to write your code along with your notes</li>
+<li><a href="https://ggplot2.tidyverse.org">ggplot2</a>: A handy and powerful visualization tool</li>
+<li><a href="https://dplyr.tidyverse.org">dplyr</a>: A tool that handles and summarizes tables</li>
+</ul></li>
+</ul>
+<pre class="r"><code>install.packages(&quot;rmarkdown&quot;)</code></pre>
+</div>
+<div id="using-rmarkdown" class="section level2">
+<h2>Using Rmarkdown</h2>
+<div id="text-and-code" class="section level3">
+<h3>Text and code</h3>
+<p>This is a line of text:</p>
+<p>“I know how to use R!”</p>
+<pre class="r"><code># This is a chunk of code
+# And the output will be shown below
+print(&quot;I know how to use R&quot;)</code></pre>
+<pre><code>## [1] &quot;I know how to use R&quot;</code></pre>
+<pre class="r"><code>2+2</code></pre>
+<pre><code>## [1] 4</code></pre>
+<ul>
+<li><p>Running code:</p></li>
+<li><p>Click on the run button on the upper-right corner of a chunk</p></li>
+<li><p>Ctrl + Enter (Windows) / Cmd + Return (Mac)</p></li>
+<li><p>Generating output</p>
+<ul>
+<li>Click the <em>knit</em> button on the upper rim of the editor</li>
+<li>Knitting will re-run your whole file, which is a good thing because it makes sure:
+<ul>
+<li>The code works on its own</li>
+<li>We haven’t accidentally deleted or added some lines of code that will break the code.</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="working-directory-and-rstudio-projects" class="section level2">
+<h2>Working directory and Rstudio projects</h2>
+<div id="what-is-a-working-directory" class="section level3">
+<h3>What is a working directory?</h3>
+<p>While we usually explore the file system with a point-and-click file manager, how files are organized under the table is somewhat complicated, and when you need access a file, you will need a precise address of it, or in programming terms <em>file path</em>.</p>
+<p>A path could be either absolute (consider a full address) or relative (e.g., if you know which <em>building</em> (= reference point) we are talking about, 10th floor is not ambiguous). The <em>working directory</em> is the <em>default reference point</em> where R (or other computational tools) will use for its relative paths.</p>
+<p>In other words, if you want to load a file, say it’s called <code>data.txt</code>. If you don’t specify the full path, R will go to your working directory to see if it can find <code>data.txt</code>.</p>
+</div>
+<div id="checking-and-setting-your-working-directory" class="section level3">
+<h3>Checking and setting your working directory</h3>
+<p>You can check the path of your working directory with <code>getwd()</code> (short for <em>get working directory</em>)</p>
+<pre class="r"><code>getwd()</code></pre>
+<pre><code>## [1] &quot;/Users/ycc/Dropbox/Docs/NYU/Teaching/SURP_2021/NYU_SURP_blogdown/content/handout/2022-06-13-prepare-your-computer-for-r&quot;</code></pre>
+</div>
+<div id="loading-in-files-from-your-working-directory" class="section level3">
+<h3>Loading in files from your working directory</h3>
+<p>Now that you have a directory, files inside that directory can be loaded in using functions like read.csv(). This function will take a comma-separated variable file (which you can make in Excel) and allow you to save it as a variable that R can work with.</p>
+<pre class="r"><code>#mytestdata
+
+read.csv(&quot;mytestdata.csv&quot;)</code></pre>
+<pre><code>##   Day Count Group
+## 1   1    12     1
+## 2   1    15     2
+## 3   2     8     1
+## 4   2     3     2
+## 5   3    10     1
+## 6   3    24     2</code></pre>
+<pre class="r"><code>mytestdata &lt;- read.csv(&quot;mytestdata.csv&quot;)
+
+mytestdata</code></pre>
+<pre><code>##   Day Count Group
+## 1   1    12     1
+## 2   1    15     2
+## 3   2     8     1
+## 4   2     3     2
+## 5   3    10     1
+## 6   3    24     2</code></pre>
+</div>
+</div>
+<div id="basic-usage-of-r-using-it-as-a-calculator" class="section level2">
+<h2>Basic usage of R: Using it as a calculator</h2>
+<p>Enter the following line of command in the console</p>
+<pre class="r"><code>17 + 2.3</code></pre>
+<pre><code>## [1] 19.3</code></pre>
+<p>In programming, division is often written as slashes (<code>/</code>), while multiplication is written as asterisks (<code>*</code>). Now, let’s try doing these in the console as well:</p>
+<pre class="r"><code># Try multiplying 8 by 7
+
+8*7</code></pre>
+<pre><code>## [1] 56</code></pre>
+<pre class="r"><code># Try dividing 48 by 12
+
+48/12</code></pre>
+<pre><code>## [1] 4</code></pre>
+</div>
+<div id="an-example-of-our-data" class="section level2">
+<h2>An example of our data</h2>
+<p>Cassandra’s data is allele frequencies as read counts from sequencing. To analyze it, she first (1) loads in the data, (2) runs an R function to analyze it, and (3) plots using ggplot2. Here is a quick version of this:</p>
+<pre class="r"><code>library(ggplot2)
+library(dplyr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>library(tidyr)
+
+#Read in the data
+WeightedMeanZStats.100 &lt;- read.csv(&quot;CBData.csv&quot;)
+
+#Look at the data (this only prints the first 6 rows)
+head(WeightedMeanZStats.100)</code></pre>
+<pre><code>##          X CHROM    POS       Bulk     Parent         Int Stat
+## 1 result.1    II 100153 -2.3893709 -1.0534663  1.64175559    Z
+## 2 result.2    II 100367 -0.9361101 -0.2837268  0.55031705    Z
+## 3 result.3    II 100413 -1.1028976 -0.6802854  0.95854049    Z
+## 4 result.4    II 100878  0.7191787  0.9999416 -1.25245792    Z
+## 5 result.5    II 101289 -1.2163032  1.4995884  0.07063202    Z
+## 6 result.6    II 101340 -1.4019217  1.1382948 -0.29809070    Z</code></pre>
+<pre class="r"><code>#Find the dimensions of the datast
+dim(WeightedMeanZStats.100)</code></pre>
+<pre><code>## [1] 95106     7</code></pre>
+<pre class="r"><code>unique(WeightedMeanZStats.100$Stat)</code></pre>
+<pre><code>## [1] &quot;Z&quot;      &quot;ZPrime&quot;</code></pre>
+<pre class="r"><code>#Plot the data using ggplot (which we&#39;ll go into more later!)
+WeightedMeanZStats.100 %&gt;% filter(Stat == &quot;ZPrime&quot;) %&gt;% pivot_longer(c(&quot;Bulk&quot;, &quot;Parent&quot;, &quot;Int&quot;)) %&gt;% 
+  ggplot(., aes(x = POS, y = value, color = name)) + geom_line(size = 1) + #geom_point(alpha = 0.1) + #+ 
+  geom_hline(yintercept = 0, color = &quot;gray&quot;) +
+  geom_hline(yintercept = c(1.96, -1.96), color = &quot;black&quot;, linetype = &quot;dashed&quot;) +
+  theme(axis.text.x = element_blank()) +  ylab(&quot;Oak &lt;- Effect -&gt; Wine&quot;) +
+  scale_color_manual(values = c(&quot;violet&quot;, &quot;lightblue&quot;, &quot;darkorange&quot;))+
+  facet_grid(~CHROM, scales = &quot;free&quot;) + ggtitle(&quot;Comparison of Zprime per Factor | Weighted Means W = 100&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+</div>
