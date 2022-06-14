@@ -17,6 +17,7 @@ html {
 body {
   font-family: inherit;
   font-size: 1rem;
+  font-weight: 400;
   line-height: inherit;
   color: inherit;
   background-color: $sta-background;
@@ -45,7 +46,7 @@ body {
 
 /* Body text */
 p {
-  margin-top: 0;
+  margin-top: 1rem;
   margin-bottom: 1rem;
 }
 
@@ -67,6 +68,7 @@ ul.task-list li input[type="checkbox"] {
 .navbar-light {
   font-family: $sta-font-nav, sans-serif;
   font-weight: 400;
+  font-size: 120%;
   line-height: 1.25;
   text-rendering: optimizeLegibility;
 }
@@ -74,9 +76,8 @@ ul.task-list li input[type="checkbox"] {
 /* Headings */
 h1, h2, h3, h4, h5, h6 {
   font-family: $sta-font-heading, sans-serif;
-  font-weight: 400;
-  margin-top: 1rem;
-  margin-bottom: .5rem;
+  margin-top: 1.2rem;
+  margin-bottom: .75rem;
   line-height: 1.25;
   color: #313131;
   text-rendering: optimizeLegibility;
@@ -93,18 +94,20 @@ h1, h2, h3, h4, h5, h6 {
 }
 h1 {
   font-size: 2.25rem;
+  font-weight: 700;
 }
 h2 {
   margin-top: 1rem;
   font-size: 1.5rem;
+  font-weight: 700;
 }
 h3 {
-  font-weight: 700;
+  /* font-weight: 700; */
   margin-top: 1.5rem;
   font-size: 1.25rem;
 }
 h4, h5, h6 {
-  font-weight: 700;
+  /* font-weight: 700; */
   margin-top: 1rem;
   font-size: 1rem;
 }

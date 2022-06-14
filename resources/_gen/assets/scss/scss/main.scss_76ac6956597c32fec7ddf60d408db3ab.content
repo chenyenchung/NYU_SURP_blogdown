@@ -3014,10 +3014,10 @@ input[type="button"].btn-block {
 
 .navbar-brand {
   display: inline-block;
-  padding-top: 0.35rem;
-  padding-bottom: 0.35rem;
+  padding-top: 0.125rem;
+  padding-bottom: 0.125rem;
   margin-right: 1rem;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   line-height: inherit;
   white-space: nowrap; }
   .navbar-brand:hover, .navbar-brand:focus {
@@ -7147,7 +7147,7 @@ a.text-dark:hover, a.text-dark:focus {
  *  Academic's Core
  **************************************************/
 html {
-  font-family: "Roboto", sans-serif;
+  font-family: "Nanum Myeongjo", sans-serif;
   font-size: 16.17px;
   color: rgba(0, 0, 0, 0.8);
   line-height: 1.65; }
@@ -7159,6 +7159,7 @@ html {
 body {
   font-family: inherit;
   font-size: 1rem;
+  font-weight: 400;
   line-height: inherit;
   color: inherit;
   background-color: #fff;
@@ -7185,7 +7186,7 @@ body {
 
 /* Body text */
 p {
-  margin-top: 0;
+  margin-top: 1rem;
   margin-bottom: 1rem; }
 
 /* Lists */
@@ -7201,17 +7202,17 @@ ul.task-list li input[type="checkbox"] {
 
 /* Navigation bar text */
 .navbar-light {
-  font-family: "Lora", sans-serif;
+  font-family: "Merriweather", sans-serif;
   font-weight: 400;
+  font-size: 120%;
   line-height: 1.25;
   text-rendering: optimizeLegibility; }
 
 /* Headings */
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Lora", sans-serif;
-  font-weight: 400;
-  margin-top: 1rem;
-  margin-bottom: .5rem;
+  font-family: "Merriweather", sans-serif;
+  margin-top: 1.2rem;
+  margin-bottom: .75rem;
   line-height: 1.25;
   color: #313131;
   text-rendering: optimizeLegibility;
@@ -7225,19 +7226,21 @@ h1, h2, h3, h4, h5, h6 {
   hyphens: manual; }
 
 h1 {
-  font-size: 2.25rem; }
+  font-size: 2.25rem;
+  font-weight: 700; }
 
 h2 {
   margin-top: 1rem;
-  font-size: 1.5rem; }
+  font-size: 1.5rem;
+  font-weight: 700; }
 
 h3 {
-  font-weight: 700;
+  /* font-weight: 700; */
   margin-top: 1.5rem;
   font-size: 1.25rem; }
 
 h4, h5, h6 {
-  font-weight: 700;
+  /* font-weight: 700; */
   margin-top: 1rem;
   font-size: 1rem; }
 
@@ -7284,7 +7287,7 @@ figcaption.numbered {
 
 pre,
 code {
-  font-family: "Cutive Mono", monospace;
+  font-family: "Inconsolata", monospace;
   color: #c7254e;
   background-color: #f9f2f4; }
 
@@ -9162,9 +9165,32 @@ html[dir="rtl"] body {
 
 .dropdown-menu,
 nav#navbar-main li.nav-item {
-  font-size: 20px;
-  font-weight: bold; }
+  font-size: 1rem; }
 
 .navbar-brand {
-  font-size: 28px;
   font-weight: bold; }
+
+.hljs {
+  font-size: .9rem;
+  margin-top: .5em;
+  margin-bottom: .5em;
+  background-color: #f2f2f2;
+  box-shadow: 5px 5px 5px #eee; }
+
+pre {
+  background-color: transparent; }
+
+/* wide elements */
+pre, pre * {
+  margin: auto 0; }
+
+pre * {
+  max-width: calc(100vw - 4em); }
+
+pre {
+  max-width: calc(100vw - 2em);
+  margin: 1em 0 1em 50%;
+  transform: translateX(-50%);
+  float: left;
+  min-width: 100%;
+  background: white; }
