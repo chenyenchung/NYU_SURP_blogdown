@@ -6,7 +6,7 @@
   
 [[main]]
   name = "Handout"
-  url = "post/"
+  url = "handout/"
   weight = 10
   
 [[main]]
