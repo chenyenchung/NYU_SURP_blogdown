@@ -13,7 +13,7 @@
   name = "Handouts"
   parent = "mat"
   weight = 10
-  url = "handout/"
+  url = "#handout"
   
 [[main]]
   name = "Extra"
