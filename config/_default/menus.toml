@@ -5,9 +5,21 @@
 
   
 [[main]]
-  name = "Handout"
-  url = "#handout"
+  name = "Material"
+  identifier = "mat"
   weight = 10
+  
+[[main]]
+  name = "Handouts"
+  parent = "mat"
+  weight = 10
+  url = "handout/"
+  
+[[main]]
+  name = "Extra"
+  parent = "mat"
+  weight = 20
+  url = "extra/"
   
 [[main]]
   name = "Worksheet and Data"

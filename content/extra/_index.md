@@ -2,5 +2,5 @@
 header:
   caption: ""
   image: ""
-title: Handouts
+title: Extra information
 ---
