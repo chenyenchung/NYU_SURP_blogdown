@@ -6,7 +6,7 @@
 # Each configuration section is defined by a name in square brackets (e.g. `[outputs]`).
 
 # Title of your site
-title = "R Workshop - NYU SURP"
+title = "R Workshop"
 
 # Output directory
 publishDir = "../nyusurp.github.io/"
