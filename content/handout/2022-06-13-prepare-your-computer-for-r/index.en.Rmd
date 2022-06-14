@@ -1,0 +1,182 @@
+---
+title: Prepare your computer for R
+author: "Cass"
+date: '2022-06-13'
+slug: prepare-your-computer-for-r
+categories:
+  - Handout
+output: 
+  html_document: 
+    toc: yes
+    code_folding: show
+tags: []
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2022-06-13T20:38:45-04:00'
+featured: yes
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+## AGENDA
+
+1. Introductions
+2. Installing R
+3. This Worksheet :)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+> Adpated from material curated by Eugene Plavskin and Grace Avecilla
+
+- [Go back to syllabus](https://nyusurp.github.io/)
+- [The slide deck for the session](https://nyusurp.github.io/slide/session_1_environment.ppt)
+- [Link to this worksheet](session_1_environment.Rmd) (Right-click -> download linked file)
+- [Solution to this worksheet](../solution/session_1_environment.html)
+
+
+## Exploring RStudio
+
+- The console: Where you run commands one by one (bottom)
+- The environment: Where you can see what is loaded in R (upper right)
+- The file explorer: An easier way for you to find files (otherwise you'll need to know the _path_ of a file to use it in R; lower right)
+
+## Installing _packages_
+
+- Packages are like kits in experiments: They _package_ the reagents and instructions for otherwise complicated processes for you.
+
+- We'll be installing 3 packages today
+  - [rmarkdown](https://rmarkdown.rstudio.com): A tool that allows you to write your code along with your notes
+  - [ggplot2](https://ggplot2.tidyverse.org): A handy and powerful visualization tool
+  - [dplyr](https://dplyr.tidyverse.org): A tool that handles and summarizes tables
+  
+```{r eval = FALSE}
+install.packages("rmarkdown")
+```
+
+
+## Using Rmarkdown
+
+### Text and code
+
+This is a line of text:
+
+"I know how to use R!"
+
+```{r}
+# This is a chunk of code
+# And the output will be shown below
+print("I know how to use R")
+
+2+2
+```
+
+
+- Running code:
+ - Click on the run button on the upper-right corner of a chunk
+ - Ctrl + Enter (Windows) / Cmd + Return (Mac)
+ 
+- Generating output
+  - Click the *knit* button on the upper rim of the editor
+  - Knitting will re-run your whole file, which is a good thing because it makes sure:
+    - The code works on its own
+    - We haven't accidentally deleted or added some lines of code that will break the code.
+    
+
+## Working directory and Rstudio projects
+
+### What is a working directory?
+
+While we usually explore the file system with a point-and-click file manager, how files are organized under the table is somewhat complicated, and when you need access a file, you will need a precise address of it, or in programming terms _file path_.
+
+A path could be either absolute (consider a full address) or relative (e.g., if you know which _building_ (= reference point) we are talking about, 10th floor is not ambiguous). The _working directory_ is the _default reference point_ where R (or other computational tools) will use for its relative paths.
+
+In other words, if you want to load a file, say it's called `data.txt`. If you don't specify the full path, R will go to your working directory to see if it can find `data.txt`.
+
+### Checking and setting your working directory
+
+You can check the path of your working directory with `getwd()` (short for _get working directory_)
+
+```{r}
+getwd()
+
+```
+  
+### Loading in files from your working directory
+
+Now that you have a directory, files inside that directory can be loaded in using functions like read.csv(). This function will take a comma-separated variable file (which you can make in Excel) and allow you to save it as a variable that R can work with.
+
+```{r}
+
+#mytestdata
+
+read.csv("mytestdata.csv")
+
+mytestdata <- read.csv("mytestdata.csv")
+
+mytestdata
+```
+
+
+## Basic usage of R: Using it as a calculator
+
+Enter the following line of command in the console
+
+```{r}
+17 + 2.3
+```
+
+In programming, division is often written as slashes (`/`), while multiplication is written as asterisks (`*`). Now, let's try doing these in the console as well:
+
+```{r}
+# Try multiplying 8 by 7
+
+8*7
+```
+
+
+```{r}
+# Try dividing 48 by 12
+
+48/12
+
+```
+
+
+## An example of our data
+
+Cassandra's data is allele frequencies as read counts from sequencing. To analyze it, she first (1) loads in the data, (2) runs an R function to analyze it, and (3) plots using ggplot2. Here is a quick version of this:
+
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+#Read in the data
+WeightedMeanZStats.100 <- read.csv("CBData.csv")
+
+#Look at the data (this only prints the first 6 rows)
+head(WeightedMeanZStats.100)
+
+#Find the dimensions of the datast
+dim(WeightedMeanZStats.100)
+
+unique(WeightedMeanZStats.100$Stat)
+
+#Plot the data using ggplot (which we'll go into more later!)
+WeightedMeanZStats.100 %>% filter(Stat == "ZPrime") %>% pivot_longer(c("Bulk", "Parent", "Int")) %>% 
+  ggplot(., aes(x = POS, y = value, color = name)) + geom_line(size = 1) + #geom_point(alpha = 0.1) + #+ 
+  geom_hline(yintercept = 0, color = "gray") +
+  geom_hline(yintercept = c(1.96, -1.96), color = "black", linetype = "dashed") +
+  theme(axis.text.x = element_blank()) +  ylab("Oak <- Effect -> Wine") +
+  scale_color_manual(values = c("violet", "lightblue", "darkorange"))+
+  facet_grid(~CHROM, scales = "free") + ggtitle("Comparison of Zprime per Factor | Weighted Means W = 100")
+
+```
+
