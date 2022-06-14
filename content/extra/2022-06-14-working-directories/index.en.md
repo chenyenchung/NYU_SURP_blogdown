@@ -9,7 +9,7 @@ categories:
 tags: []
 subtitle: ''
 summary: ''
-lastmod: '2022-06-14T00:56:49-04:00'
+lastmod: '2022-06-14T08:56:49-04:00'
 featured: no
 image:
   caption: ''
@@ -18,7 +18,7 @@ image:
 projects: []
 ---
 
-There are two different ways to represent where a file is: Absolute or relative.
+There are two different ways to represent where a file is: Absolute and relative.
 
 Absolute path for a file is using the root as the starting point (`/` for Linux 
 and Mac and `C:\` for Windows). This is usually clear to the computer, but it 

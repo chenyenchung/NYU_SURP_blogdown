@@ -54,6 +54,7 @@ ignoreFiles = ["static/assets/", "\\.ipynb$", ".ipynb_checkpoints$", "\\.Rmd$", 
   publication_types = "/publication-type/:slug/"
   post = "/:year/:month/:day/:slug/"
   handout = "/:year/:month/:day/:slug/"
+  extra = "/:year/:month/:day/:slug/"
 
 [outputs]
   home = [ "HTML", "RSS", "JSON", "WebAppManifest" ]
