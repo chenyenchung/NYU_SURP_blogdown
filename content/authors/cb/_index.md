@@ -4,7 +4,7 @@ title: Cassandra Buzby
 
 # Username (this should match the folder name)
 authors:
-- Cass
+- 'cb'
 
 
 bio: 

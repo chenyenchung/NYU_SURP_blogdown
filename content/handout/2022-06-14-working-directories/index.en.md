@@ -1,6 +1,7 @@
 ---
 title: "Working directories"
-author: "Yen-Chung Chen"
+authors: 
+  - 'ycc'
 date: '2022-06-14'
 slug: working-directories
 categories:
@@ -8,7 +9,6 @@ categories:
 tags: []
 subtitle: ''
 summary: ''
-authors: []
 lastmod: '2022-06-14T00:56:49-04:00'
 featured: no
 image:

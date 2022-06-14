@@ -4,7 +4,9 @@ title: Yen-Chung Chen
 
 # Username (this should match the folder name)
 authors:
-- Yen
+- 'ycc'
+
+
 bio: A graduate student interested in developmental biology, neurobiology and bioinformatics.
 
 email: ""
@@ -34,7 +36,7 @@ social:
   icon_pack: ai
   link: https://orcid.org/0000-0002-8529-1251
   
-superuser: true
+superuser: false
 user_groups:
 - Speakers
 ---
