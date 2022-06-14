@@ -39,7 +39,11 @@
   
 [[main]]
   name = "Session 1: Welcome"
+<<<<<<< HEAD
   parent = "slides"
+=======
+  parent = slides
+>>>>>>> 7be2fa86e86e69eb942eaa7d6cb1d03051faadb9
   weight = 10
   url = "slides/session_1/session_1_welcome.html"
   
