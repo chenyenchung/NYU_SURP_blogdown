@@ -32,11 +32,17 @@
   parent = "wsd"
   url = "assets/session1.zip"
   
-#[[main]]
-#  name = "Slide Deck"
-#  weight = 30
-#  url = "privacy.md"
-#  
+[[main]]
+  name = "Slide Deck"
+  weight = 40
+  identifier = "slides"
+  
+[[main]]
+  name = "Session 1: Welcome"
+  parent = "slides"
+  weight = 10
+  url = "slides/session_1/session_1_welcome.html"
+  
 # [[main]]
 # name = "Full Publications"
 # url = "publication/"
