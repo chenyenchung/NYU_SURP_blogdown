@@ -10,6 +10,7 @@ output:
   html_document: 
     toc: yes
     code_folding: show
+    code_download: true
 tags: []
 subtitle: ''
 summary: ''
