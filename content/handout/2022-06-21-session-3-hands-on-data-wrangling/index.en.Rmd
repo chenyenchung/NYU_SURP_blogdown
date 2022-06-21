@@ -1,13 +1,13 @@
 ---
-title: 'Session 3: Hands-On Data Wrangling'
+title: 'Hands-On Data Wrangling'
 authors: ['ycc']
 date: '2022-06-21'
-slug: session-3-hands-on-data-wrangling
+slug: hands-on-data-wrangling
 categories:
   - Handout
 output:
   html_document:
-    toc: yes
+    toc: true
     code_folding: show
     code_download: true
 tags: []
