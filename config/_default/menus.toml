@@ -45,6 +45,12 @@
   url = "assets/session3.zip"
   
 [[main]]
+  name = "Session 4"
+  weight = 40
+  parent = "wsd"
+  url = "assets/session4.zip"
+  
+[[main]]
   name = "Slide Deck"
   weight = 40
   identifier = "slides"
