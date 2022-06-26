@@ -1,0 +1,401 @@
+---
+title: 'Hands-On Data Wrangling'
+authors: ['ycc']
+date: '2022-06-21'
+slug: hands-on-data-wrangling
+categories:
+  - Handout
+output:
+  html_document:
+    toc: true
+    code_folding: show
+    code_download: true
+tags: []
+subtitle: ''
+summary: ''
+lastmod: '2022-06-21T10:37:17-04:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+## Loading data
+
+Following what we did last week, we are going to keep working with the penguins 
+today. You can find the dataset after you extracted `session3.zip` which 
+you can download from [here](https://nyusurp.github.io/assets/session3.zip).
+
+### Figure things out on the internet
+
+If you don't remember how to do something with R and happen to be the most 
+R-fluent people in the peer, don't panic. Most of the time, searching for 
+_[what you want to do] in R_ work out great.
+
+Online forums like StackOverflow and Kaggle often give great answers with code 
+examples that you could play with. If you are a genomic person, Biostar and 
+SEQanswers would be your friend.
+
+```{r Loading-data}
+library(dplyr)
+# How do you load a csv file with R?
+penguins <- read.csv("penguins.csv")
+```
+
+### Figuring things out within R
+
+Oftentimes, an answer you found online provides a code that almost works, but 
+you might not yet know enough to make it work. For times like this, R has 
+documentation built in for each function describing the arguments that you can 
+tweak and what it meant.
+
+You can trigger the help page with `?[function]` in the console. Let's try it 
+out: We used `head()` last week to take a glimpse of the first few rows of a 
+table, so how do we print the first _3_ instead of 6 rows?
+
+```{r First-3-rows}
+head(penguins, n = 3)
+```
+
+## `count()` things
+
+How many penguins of each `species` were observed on each `island`?
+
+```{r count-per-species-per-island}
+penguins %>%
+  count(island, species)
+```
+
+Which species is found on all islands? I know it's obvious, but let's use a 
+sledgehammer to crack a nut this time.
+
+```{r most-prevalent-species}
+# The output in the previous chunk is also a table that could be count()ed.
+penguins %>%
+  count(island, species) %>%
+  count(species)
+```
+
+## `filter()` out your species
+
+Let's say you are interested in comparing how the islands influences the growth 
+of penguins. Either you'll need to go to Antarctica to observe more Gentoo or 
+Chinstrap penguins on other islands, or only Adelie penguins make sense for 
+your purpose.
+
+```{r subset-Adelie-penguins}
+# Since none of us is going to leave for Antarctica any time soon (right?)
+# Let's keep only the Adelie penguins, and **assign it to a new object**.
+adelie <- penguins %>%
+  filter(species == "Adelie")
+```
+
+### Revisiting the criteria for `filter()`
+
+There are 6 basic types of comparison:
+
+- `==`: Equal to
+- `!=`: Not equal to
+- `>`: Larger than
+- `>=`: Larger or equal to
+- `<`: Less than
+- `<=`: Less than or equal to
+
+```{r filter-with-equal}
+# How many male Adelie penguins were observed?
+adelie %>%
+  filter(sex == "male") %>%
+  count()
+```
+
+```{r filter-with-not-equal}
+# How many Adelie penguins were found on islands that are not Dream island?
+adelie %>%
+  filter(island != "Dream") %>%
+  count()
+```
+
+```{r filter-less-or-equal}
+# How many Adelie penguins were observed during or before 2008?
+adelie %>%
+  filter(year <= 2008) %>%
+  count()
+```
+
+### Combining criteria
+
+Sometimes, we'll need more than one criteria to get the data we want.
+For example, if you are interested in the female Adelie penguins on the Biscoe 
+island:
+
+```{r two-filter-criteria}
+adelie %>%
+  filter(sex == "female", island == "Biscoe")
+```
+
+What if you need penguins with extreme body weight? Say either over 4700g or 
+below 2900g.
+
+```{r or-gate}
+adelie %>%
+  filter(body_mass_g > 4700 | body_mass_g < 2900)
+```
+
+#### Logical operations: What's happening under the `dplyr` table
+
+Essentially, what `filter()` relies on is to ask a series of yes/no question 
+to each row of a column, and the answers to these yes/no questions are called 
+Boolean or logical values.
+
+In R, `TRUE` means yes, while `FALSE` means no.
+
+```{r logical-1}
+# Is 3 larger than 5?
+3 > 5
+```
+
+```{r logical-2}
+# Is 2022 equal to 2020?
+2022 == 2020
+```
+
+```{r logical-3}
+# Is "apple" not equal to "orange"?
+"apple" != "orange"
+```
+
+These logical values can be further calculated with `&` (AND), `|` (OR), and 
+`xor()`.
+
+|            |  `&`  |  `|`  |`xor()`|
+|------------|:-----:|:-----:|:-----:|
+|  TRUE/TRUE | TRUE  | TRUE  | FALSE |
+| TRUE/FALSE | FALSE | TRUE  | TRUE  |
+| FALSE/TRUE | FALSE | TRUE  | TRUE  |
+| FALSE/FALSE| FALSE | FALSE | FALSE |
+
+So, how many Adelie penguins either have a bill length shorter than 35mm 
+or a bill depth below 15mm?
+
+```{r bill-or-practice}
+adelie %>%
+  filter(bill_length_mm < 35 | bill_depth_mm < 15) %>%
+  count()
+```
+
+Now that we know `filter()` is working with logical values, you won't be 
+surprised that it can also use other functions that gives a logical value 
+as its output as a criterion.
+
+For example, we mentioned that `NA` is how R labels missing data. Since we are 
+interested in body weight, we might want throw away rows with missing body 
+weight...
+
+```{r NA-is-a-special-case}
+# You might want to try filtering for body_mass_g== NA
+adelie %>%
+  filter(body_mass_g == NA)
+```
+
+What is happening? Remember that we said R treats NA very differently. As a 
+matter of fact, almost every operation gives you `NA` when `NA` is involved.
+
+```{r NA-is-I-dont-know}
+# Try these
+5 == NA
+3 > NA
+"North America" != NA
+3.1415926 <= NA
+```
+
+Since `NA` is missing data, this actually makes sense:
+
+`5 == NA` is like asking "is 5 equal to something I don't know?", and the 
+answer has to be "I don't know".
+
+So, how do we ask R if it doesn't know something or has an `NA` there? We use 
+`is.na()`.
+
+```{r try-isna}
+is.na(NA)
+is.na("National Academy")
+```
+
+You can use `is.na()` with `filter()` to find the rows where body weight is 
+`NA`.
+
+```{r filter-na}
+# Use is.na() to get rows with NA in body_mass_g
+adelie %>%
+  filter(is.na(body_mass_g))
+```
+
+How do we select all other rows then? In R, `!` flips a logical value, and you 
+can pronounce it as _not_.
+
+```{r not-logical}
+# Not TRUE
+!TRUE
+# Not FALSE
+!FALSE
+# Flipping (3 > 5)
+!(3 > 5)
+```
+
+We can use `!` to find rows that are _not_ `NA`.
+
+```{r drop-nas}
+# How many Adelie penguins have their body mass recorded?
+adelie %>%
+  filter(!is.na(body_mass_g)) %>%
+  count()
+```
+
+### Extended reading: Dealing with missing values
+
+Depends on what you work with, you might not always want to drop missing values.
+
+If you are not going to throw those data away, you'll need to ask yourself 
+questions like "Does missing value appear randomly?", and decide how to best 
+deal with them.
+
+If you are interested, Hadley Wickham has 
+[a section in his book _R for Data Science_](https://r4ds.hadley.nz/missing-values.html)
+discussing this.
+
+## Group your data for further analysis
+
+Let's say we are interested in how body weight differs between islands.
+To perform this analysis, we might want to calculate the median and standard 
+deviation of body mass per island.
+
+To indicate how `dplyr` should group your data, we use `group_by()` to tell 
+it which column contains the group labels.
+
+Let's assign the grouped data to another object named `adelie_per_island`
+
+```{r group-by-island}
+adelie_per_island <- adelie %>%
+  filter(!is.na(body_mass_g)) %>%
+  group_by(island)
+```
+
+## Get summary statistics with `summarize()`
+
+Now that we grouped the data, we can calculate the summary statistics.
+
+The syntax for `summarize()` is as follows:
+
+```{r mean-exp}
+# You tell summarize() which functions to use on which column
+adelie_per_island %>%
+  summarize(mean(body_mass_g))
+```
+
+By default, the column names of the summary table is the function call we gives
+to `summarize()`, which could be a bit ugly. We can rename the columns by:
+
+```{r mean-exp-with-cname}
+adelie_per_island %>%
+  summarize(mean_bw = mean(body_mass_g))
+```
+
+The summary statistics that we use the most often are:
+
+- Arithmetic mean (`mean()`)
+- Median (`median()`)
+- Standard deviation (`sd()`)
+
+Let's summarize the data with median and standard deviation per island.
+
+```{r summarize-practice}
+# Summarize the Adelie subset per island with the median and standard deviation 
+# of the body mass
+adelie_per_island %>%
+  summarize(bw_median = median(body_mass_g), bw_sd = sd(body_mass_g))
+```
+
+### What if you don't group?
+
+```{r try-without-grouping}
+adelie %>%
+  filter(!is.na(body_mass_g)) %>%
+  summarize(bw_median = median(body_mass_g), bw_sd = sd(body_mass_g))
+```
+
+### What if you want to group with another grouping variable?
+
+```{r alt-group}
+# Let's group with sex
+adelie %>%
+  filter(!is.na(body_mass_g), !is.na(sex)) %>%
+  group_by(sex) %>%
+  summarize(bw_median = median(body_mass_g), bw_sd = sd(body_mass_g))
+```
+
+## A picture is worth a thousand words
+
+While it's great to have summary statistics, oftentimes a quick visualization 
+of our data will be very helpful.
+
+`qplot()` provided by `ggplot2` is designed for this purpose and can be easily 
+incorporated into your pipeline.
+
+### Example: a quick scatter/strip plot per island
+
+Let's plot something with _points_ on a plane where the x-axis is the islands 
+and the y-axis is the body weight.
+
+```{r qplot-strip}
+# Load ggplot2
+library(ggplot2)
+
+adelie_per_island %>%
+  qplot(data = ., x = island, y = body_mass_g, geom = "point")
+```
+
+There several required arguments for `qplot()`:
+
+- data: The data you want to plot.
+- x: The column name of the variable you want to use as the x-axis
+- y: The column name of the variable you want to use as the y-axis
+- color: The column name of the variable you want to color your plot by
+- geom: Short for "geometry", the type of plots you want to do. Popular ones 
+include:
+  - point
+  - bar
+  - boxplot
+  - violin
+  - histogram
+  - density
+  
+```{r qplot-box}
+# Let's do a boxplot instead
+adelie_per_island %>%
+  qplot(data = ., x = island, y = body_mass_g, geom = "boxplot")
+```
+### What is the distribution of bill lengths of the whole dataset?
+
+```{r qplot-histogram}
+# Plot a histogram with bill lengths on the x-axis
+penguins %>%
+  qplot(data = ., x = bill_length_mm, geom = "histogram")
+```
+
+### Is bill length and depth correlated for the Adelie penguins?
+
+```{r qplot-scatter}
+# Plot a point plot with bill length on the x, bill depth on the y, and
+# color by sex
+adelie %>%
+  qplot(
+    data = .,
+    x = bill_length_mm,
+    y = bill_depth_mm,
+    color = sex,
+    geom = "point"
+  )
+
+```
+

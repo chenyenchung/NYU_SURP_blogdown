@@ -33,6 +33,24 @@
   url = "assets/session1.zip"
   
 [[main]]
+  name = "Session 2"
+  weight = 20
+  parent = "wsd"
+  url = "assets/session2.zip"
+
+[[main]]
+  name = "Session 3"
+  weight = 30
+  parent = "wsd"
+  url = "assets/session3.zip"
+  
+[[main]]
+  name = "Session 4"
+  weight = 40
+  parent = "wsd"
+  url = "assets/session4.zip"
+  
+[[main]]
   name = "Slide Deck"
   weight = 40
   identifier = "slides"
@@ -42,6 +60,12 @@
   parent = "slides"
   weight = 10
   url = "slides/session_1/session_1_welcome.html"
+  
+[[main]]
+  name = "Session 2: dplyr"
+  parent = "slides"
+  weight = 20
+  url = "slides/session_2/session_2_EDA_summary.html"
   
 # [[main]]
 # name = "Full Publications"

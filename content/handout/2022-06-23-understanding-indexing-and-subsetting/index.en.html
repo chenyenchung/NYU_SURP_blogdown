@@ -1,0 +1,236 @@
+---
+title: Understanding Indexing and Subsetting
+authors: ['cb']
+date: '2022-06-23'
+slug: understanding-indexing-and-subsetting
+categories:
+  - Handout
+tags: []
+subtitle: ''
+summary: ''
+lastmod: '2022-06-23T13:33:39-04:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+
+
+<div id="indexing" class="section level1">
+<h1>Indexing</h1>
+<div id="what-do-we-mean-by-indexing" class="section level3">
+<h3>What do we mean by indexing?</h3>
+<p>So far, we’ve worked with data frames in R. Each data frame is really a set of rows and columns with values populated, and these can be broken down into what are called vectors. A vector is simply a one-dimensional set of <em>something</em> that can have at minimum length 1.</p>
+<p>We can create vectors using the function c(), for concatenate.</p>
+<pre class="r"><code>FirstVector &lt;- c(4,20,10,21,60,3,14,63,9,6)
+
+FirstVector</code></pre>
+<pre><code>##  [1]  4 20 10 21 60  3 14 63  9  6</code></pre>
+<p>This vector has a length, and each number has an index within that vector. In the upper right, you can see that your FirstVector values are 1:10 and numeric. We can also use the length() function to find out how many elements we have in our vector.</p>
+<pre class="r"><code>length(FirstVector)</code></pre>
+<pre><code>## [1] 10</code></pre>
+<p>If we wanted to identify the first value, we could use square brackets, ‘[]’, to identify that value. R will print the value that corresponds with that number.</p>
+<pre class="r"><code>FirstVector[1]</code></pre>
+<pre><code>## [1] 4</code></pre>
+<p>If we wanted to find the fifth value, we would use the following:</p>
+<pre class="r"><code>FirstVector[5]</code></pre>
+<pre><code>## [1] 60</code></pre>
+<pre class="r"><code>#What is the 9th element in the vector? Write your code below:</code></pre>
+<p>To make a set of numbers that is in a sequence by one, we can just use a ‘:’ to tell R to print that sequence. We can make a new vector using this:</p>
+<pre class="r"><code>SecondVector &lt;- 1:10
+SecondVector</code></pre>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
+<p>Similarly, we can subset using the ‘:’ to ask R to give us a set of numbers to index by, such as the first three elements in the FirstVector.</p>
+<pre class="r"><code>FirstVector[1:3]</code></pre>
+<pre><code>## [1]  4 20 10</code></pre>
+<pre class="r"><code>#Find the last 4 elements of SecondVector. Print your code below:</code></pre>
+</div>
+<div id="indexing-data-frames" class="section level3">
+<h3>Indexing Data Frames</h3>
+<p>If we wanted to make a data frame from vectors that we already have, we can use the data.frame() function to combine vectors <em>of the same size</em>. If the vectors are different sizes, R won’t know what to do with the extra slots and will give you an error.</p>
+<pre class="r"><code>#Making a data frame from vectors
+
+NewDataFrame &lt;- data.frame(Random = FirstVector, Index = SecondVector)
+
+NewDataFrame</code></pre>
+<pre><code>##    Random Index
+## 1       4     1
+## 2      20     2
+## 3      10     3
+## 4      21     4
+## 5      60     5
+## 6       3     6
+## 7      14     7
+## 8      63     8
+## 9       9     9
+## 10      6    10</code></pre>
+<p>Instead of using length() to find out the size of a data frame, we would need to find the <em>dimensions</em> of that data frame. We briefly covered this function in earlier sessions: you can use dim().</p>
+<pre class="r"><code>dim(NewDataFrame)</code></pre>
+<pre><code>## [1] 10  2</code></pre>
+<p>The output of dim() is a vector, which gives the number of rows (first number) and the number of columns (second number). An easy way to remember this is “railroad car”, which always has R before C, or rows before columns.</p>
+<p>What if we wanted to find the first row of our data frame? We could use square brackets again, but this time we would need to add a column in between our row argument and our column argument. To select <em>all</em> of the values of one row or column, leave the element (before or after the comma) blank.</p>
+<pre class="r"><code>#The following code will give the first row:
+NewDataFrame[1,]</code></pre>
+<pre><code>##   Random Index
+## 1      4     1</code></pre>
+<pre class="r"><code>#This next code will give the second column:
+NewDataFrame[,2]</code></pre>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
+<p>What if we wanted to find the first column and fourth row element? We would indicate both of these numbers in square brackets:</p>
+<pre class="r"><code>NewDataFrame[4,1]</code></pre>
+<pre><code>## [1] 21</code></pre>
+<pre class="r"><code>#Find the third element of the second column below:
+
+#Find the last 3 elements of the first column below:</code></pre>
+</div>
+<div id="using-column-names-with" class="section level3">
+<h3>Using column names with $</h3>
+<p>If you wanted to refer to a column by name, you can do so with the $ operator. We can print the second column as such:</p>
+<pre class="r"><code>NewDataFrame$Index</code></pre>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
+<p>If we wanted to select the second element of the Index column, we could do so using the square brackets as we did before; in this case, though, we now have a vector (the column) rather than a data frame, so we only need one dimension in our square brackets:</p>
+<pre class="r"><code>NewDataFrame$Index[2]</code></pre>
+<pre><code>## [1] 2</code></pre>
+<pre class="r"><code>#Find the fourth element of the Random column below:</code></pre>
+</div>
+</div>
+<div id="logicals" class="section level1">
+<h1>Logicals</h1>
+<div id="a-review-of-booleans" class="section level3">
+<h3>A review of Booleans</h3>
+<p>Booleans are true/false statements that are evaluated by R. TRUE is encoded by a 1, and FALSE is encoded by a 0. R recognizes the words “TRUE” and “FALSE” when they are capitalized.</p>
+<p>We can evaluate two numbers by using the ‘==’ sign between them:</p>
+<pre class="r"><code>2 == 2</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>2 == 3</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<p>We can also find the numbers in a vector that are equal to a certain number:</p>
+<pre class="r"><code>FirstVector == 4</code></pre>
+<pre><code>##  [1]  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</code></pre>
+<p>Note that only the first element of FirstVector is 4; the rest are not, and so this evaluates to FALSE.</p>
+<p>We can also use the &lt; and &gt; to evaluate, and &lt;= and &gt;=:</p>
+<pre class="r"><code>FirstVector &lt; 10</code></pre>
+<pre><code>##  [1]  TRUE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE  TRUE  TRUE</code></pre>
+<pre class="r"><code># Find all of the values of SecondVector that are greater than or equal to 4
+
+# Find all of the values of FirstVector that are less than 5</code></pre>
+<p>We can also evaluate two vectors to see if they have the same values:</p>
+<pre class="r"><code>FirstVector == NewDataFrame[,1]</code></pre>
+<pre><code>##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE</code></pre>
+<pre class="r"><code>#Below, use &#39;!=&#39; to ask if FirstVector is NOT equal to the first column of NewDataFrame</code></pre>
+<p>Finally, we can compare if two columns are equal in our data frame:</p>
+<pre class="r"><code>NewDataFrame$Random == NewDataFrame$Index</code></pre>
+<pre><code>##  [1] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE</code></pre>
+</div>
+</div>
+<div id="subsetting" class="section level1">
+<h1>Subsetting</h1>
+<div id="subsetting-by-values" class="section level3">
+<h3>Subsetting by values</h3>
+<p>We’ve done this using dplyr in the past; we can take a data frame and filter it by a certain value. Without using the dplyr package, we can also do this based on the rows and column indices. Keep in mind that if you’re using the full name of the column,</p>
+<pre class="r"><code>#First we can print the indices where the Random column equals 4
+NewDataFrame$Random == 4</code></pre>
+<pre><code>##  [1]  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</code></pre>
+<pre class="r"><code>#By placing the true values in the square brackets, this code prints the rows where Rnadom is equal to 4
+NewDataFrame[NewDataFrame$Random == 4,]</code></pre>
+<pre><code>##   Random Index
+## 1      4     1</code></pre>
+<pre class="r"><code>#Below, find the rows where the Random column is greater than 50
+
+#Next, find the rows in which the Random column value is less than OR equal to the Index column value</code></pre>
+<p>Of course, this can also be done using dplyr, but with naming columns and not the data frame:</p>
+<pre class="r"><code>library(dplyr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>NewDataFrame %&gt;% filter(Random == 4)</code></pre>
+<pre><code>##   Random Index
+## 1      4     1</code></pre>
+</div>
+<div id="putting-it-together" class="section level3">
+<h3>Putting it together</h3>
+<p>Before we move on to visualizing, we can also create a new column in our data frame using $, and we can populate that by using booleans:</p>
+<pre class="r"><code>NewDataFrame$NewColumn &lt;- NewDataFrame$Random &gt;= NewDataFrame$Index
+
+NewDataFrame</code></pre>
+<pre><code>##    Random Index NewColumn
+## 1       4     1      TRUE
+## 2      20     2      TRUE
+## 3      10     3      TRUE
+## 4      21     4      TRUE
+## 5      60     5      TRUE
+## 6       3     6     FALSE
+## 7      14     7      TRUE
+## 8      63     8      TRUE
+## 9       9     9      TRUE
+## 10      6    10     FALSE</code></pre>
+</div>
+</div>
+<div id="visualizing-the-subset" class="section level1">
+<h1>Visualizing the subset</h1>
+<div id="plotting-subsetted-values" class="section level3">
+<h3>Plotting subsetted values</h3>
+<p>If you wanted to plot only specific values, you could use these same booleans inside the functions to plot. This is going to be the basis of how we separate out values in our plots.</p>
+<pre class="r"><code>library(ggplot2)
+
+# Plot our data frame here
+qplot(x = NewDataFrame$Random, y = NewDataFrame$Index)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<pre class="r"><code>qplot(x = Random, y = Index, data = NewDataFrame)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-21-2.png" width="672" /></p>
+<pre class="r"><code># We can change the size of our points by adding in the &#39;size&#39; argument
+qplot(x = NewDataFrame$Random, y = NewDataFrame$Index, size = 1)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-21-3.png" width="672" /></p>
+<pre class="r"><code># Finally, we can add in coloring by a boolean logical
+qplot(x = NewDataFrame$Random, y = NewDataFrame$Index, color = NewDataFrame$Index &gt; 5, size = 1)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-21-4.png" width="672" /></p>
+<pre class="r"><code>qplot(x = NewDataFrame$Random, y = NewDataFrame$Index, color = NewDataFrame$NewColumn, size = 1)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-21-5.png" width="672" /></p>
+</div>
+</div>
+<div id="exploring-r" class="section level1">
+<h1>Exploring R</h1>
+<p>One of the most important things to do in R is read the documentation for different packages and functions. If we look at the function for qplot, it will give us the options for our plots.</p>
+<p>We can do this by either running help(<function>) or ?<function>, as done below:</p>
+<pre class="r"><code>help(qplot)
+?qplot</code></pre>
+<p>This has lots of options, but the examples show where they have options for size and color. We’ll get into how to use these (and more!) in ggplot later, but you can explore how to visualize your own data using qplot, as long as you remember to load ggplot2 into your workspace.</p>
+<p>You’ll notice that there’s an option for <em>geom</em>. This is the type of plot that will be made, and the default is a scatter plot (so geom = “point”). You can find this in the defaults for geom.</p>
+<pre class="r"><code>#Make a scatter plot
+qplot(x = Index, y = Random, data = NewDataFrame,
+      geom = &quot;point&quot;,
+      xlim = c(0,25), ylim = c(0,100),
+      main = &quot;Title of Randomness&quot;,
+      xlab = &quot;Index Expanded&quot;,
+      ylab = &quot;Random Numbers&quot;,
+      color = Random &gt; 5, size = 1)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<pre class="r"><code>#Make a box plot with scatter (called jitter)
+qplot(x = Random, y = NewColumn, data = NewDataFrame,
+      geom = c(&quot;boxplot&quot;, &quot;jitter&quot;),
+      main = &quot;Boxplot of Random Numbers&quot;,
+      color = Index)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+<div id="practice" class="section level3">
+<h3>Practice</h3>
+<p>Load in the dataset penguins.csv, and plot the bill length vs body mass of penguins, coloring by species and changing the shape by island.</p>
+<pre class="r"><code>#Load in the csv using read.csv()
+
+#View the data by using head() and find the names of the columns using str()
+
+#Use qplot to plot the columns that you&#39;re interested in</code></pre>
+</div>
+<div id="advanced-practice" class="section level3">
+<h3>Advanced Practice</h3>
+<p>Using either dplyr or subsetting, plot the Gentoo penguins bill length vs body mass, and color by if their body mass is above 5500.</p>
+<pre class="r"><code># Your code below</code></pre>
+</div>
+</div>
