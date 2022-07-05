@@ -1,0 +1,440 @@
+---
+title: Functions and Data Types
+date: '2022-06-30'
+authors: ['ycc']
+slug: functions-and-data-types
+categories:
+  - Handout
+tags: []
+subtitle: ''
+summary: ''
+lastmod: '2022-06-30T11:17:06-04:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+## Outline
+
+1. Review: Write yourself some functions
+
+2. Types: How they matter and how to avoid being bitten by them
+
+## Function practice: Normalizing RNA-Sequencing
+
+We will be using part of the data from [a study on spinal motor neurons](https://pubmed.ncbi.nlm.nih.gov/27568519/). You can find their full 
+analysis scripts [here](https://github.com/dasenlab/Pbx-Neuron-Paper).
+
+```{r}
+# Use read.delim instead of read.csv for **tab**-delimited files
+rawcount = read.delim("BR-A-Control_counts.txt")
+```
+
+What is in the raw data?
+
+```{r}
+# Inspect the data you load!
+
+```
+
+### `normalize_by_depth()`
+
+How do we define a function that normalize a vector of counts by total counts?
+
+Before you start writing. Let's start humble and get a small proportion of the 
+data so you can capture errors right away when you test your function.
+
+The key of doing this is to have something that you can tell whether your code 
+is doing something you want right away with test data structurally similar to the 
+real data.
+
+```{r}
+# Take a small fraction of the data so we can test our function
+test_count = head(rawcount)
+```
+
+Now, we are good to go. Let's get the total count first!
+
+```{r}
+# What is our input?
+normalize_by_depth = function(input) {
+  # How do we compute total count?
+  
+  # Let's divide everything by the total count calculated above
+  
+  # Provide an output
+  
+}
+```
+
+Let's test the function with our naked eyes.
+
+```{r}
+# Is the function doing what we expect it to do?
+normalize_by_depth(test_count) == 1472 + 6 + 109 + 43
+```
+
+If everything goes as expected, let's divide everything by total count in the 
+function, too.
+
+```{r}
+# What is our input?
+normalize_by_depth = function(input) {
+  # How do we compute total count?
+  depth = sum(input$count)
+  # Let's divide everything by the total count calculated above
+  
+  # Provide an output
+  # **Note that you would want to change your output!**
+  return(depth)
+}
+```
+
+Let's test the revised function. What are we expecting here?
+
+```{r}
+# We are expecting the first gene to be ~0.903 after normalization
+# while the second gene is 0.
+# Let's run the function on the test set and let the results print out.
+
+```
+
+Let's multiply the result by $10^{6}$ (10^6) before returning it in our
+function.
+
+```{r}
+# What is our input?
+normalize_by_depth = function(input) {
+  # How do we compute total count?
+  depth = sum(input$count)
+  
+  # Let's divide everything by the total count calculated above
+  normalized_count = input$count/depth
+  input$normalized_count = normalized_count
+  
+  # Provide an output
+  return(input)
+}
+```
+
+And test it again.
+
+Note that for the first gene, we used to getting 0.9030675 before multiplying with
+$10^{6}$.
+
+```{r}
+normalize_by_depth(test_count)
+```
+
+### `get_tx_length()`
+
+A gene model file contains the starting and ending coordinates of genes,
+transcripts, and exons.
+
+You can get a gene model file from [Ensembl](http://useast.ensembl.org/info/data/ftp/index.html/).
+
+They are often stored as GTF/GFF3 files, but the format is beyond the scope
+of what we are going to do today. If you are interested, you can find
+[more information about GTF/GFF format here](https://useast.ensembl.org/info/website/upload/gff.html).
+
+```{r}
+# Load gene model file (pre-processed)
+gene_model = read.csv("mouse_gene_model.csv")
+head(gene_model)
+```
+
+
+How do we define a function that get us lengths for each gene?
+
+--
+
+```{r}
+library(dplyr)
+# How do we compute the length of each exons?
+gene_model %>%
+  head() %>%
+  mutate(length = (end - start + 1))
+```
+
+Let's test if the length column is correctly calculated.
+
+```{r}
+# For the first gene
+150958296 - 150956201	+ 1
+```
+
+If it seems right, let's get the sum of lengths per id now.
+
+```{r}
+get_tx_length = function(input) {
+  # How do we compute the sum of all exons of a gene?
+  tx_length = input %>%
+    mutate(length = (end - start + 1))
+  # Group
+  
+  # Summarize by summation
+  
+  # Provide an output
+  return(tx_length)
+}
+```
+
+What does the output look like?
+
+```{r}
+gene_model %>%
+  head() %>%
+  get_tx_length()
+```
+
+How do you independently test if the answer is correct for ENSMUSG00000097426?
+
+```{r}
+# Doing it differently with base R
+gene_of_interest = gene_model[gene_model$id == "ENSMUSG00000097426", ]
+print(gene_of_interest)
+```
+
+```{r}
+gene_of_interest$length = gene_of_interest$end - gene_of_interest$start + 1
+print(gene_of_interest)
+```
+
+```{r}
+sum(gene_of_interest$length)
+```
+
+### How to merge data with a shared column?
+
+If we check our small count table:
+
+```{r}
+head(rawcount)
+```
+
+and the first few rows of our gene length table:
+
+```{r}
+gene_model %>%
+  head() %>%
+  get_tx_length()
+```
+
+
+You'll see that we are almost done except that the row order are not exactly 
+the same.
+
+This can be taken care of by `left_join(x, y, by = column)`, which is a `dplyr` 
+function that **merge two data.frames (`x` and `y`) by a shared column.
+
+(`left_` means that it keeps all the rows in `x` even if `y` does not have it.)
+
+Let's see how it works. First, I'll make a small table of gene length for
+testing.
+
+```{r}
+test_gene_model = gene_model %>%
+  # Only keep rows that are present in test_count
+  filter(id %in% test_count$id)
+
+# Compute gene length with our custom function
+test_gene_length = test_gene_model %>% 
+    get_tx_length()
+
+print(test_gene_length)
+```
+
+And... boom!
+
+```{r}
+left_join(x = test_count, y = test_gene_length, by = "id")
+```
+
+This works regardless of how the rows are ordered. You can try messing up
+the rows and see how if it makes a difference.
+
+```{r}
+# Mess up the rows and do left_join() again.
+# Say we have test_count[c(1, 3, 5, 2, 4, 6), ] and
+# test_gene_model[c(6, 5, 4, 3, 2, 1), ]
+
+```
+
+### One function to do it all
+
+You must have noticed that functions are like Russian dolls: There are always
+functions inside a function.
+
+Now that we have `normalize_by_depth` to generate CPM, `get_tx_length` to
+calculate gene length, and we know that `left_join` can merge them by ID, we
+can write a master function to streamline everything.
+
+
+```
+normalize_rnaseq = function(count, gene_model){
+  # 1. Normalize read counts by sequencing depth = total reads we got from a sample.
+  # (This gives CPM)
+
+  # 2. Normalize again with transcript length.
+  # (CPM/Gene length = Transcript per million (TPM))
+  
+  # 3. Make a master table containing both CPM and length per gene
+
+  return(normalized_count)
+}
+```
+
+Finally, let's test it:
+
+```{r error = TRUE}
+normalize_rnaseq(test_count, test_gene_model)
+```
+
+All your hard work pays now -- you can normalize the whole thing with ease!
+
+```{r}
+# Normalize the full table with full gene model
+
+```
+
+## Common pitfalls on data types
+
+### `character`s are friendly most of the time, but...
+
+#### Hidden character
+
+```{r}
+# There's a L0 masquerading as 10 in your csv!
+fake_num = c("1", "3", "5", "7", "9", "l0")
+```
+
+```{r}
+typeof(fake_num)
+```
+
+```{r}
+as.numeric(fake_num)
+```
+
+#### Alphabetical and numerical sorting
+
+```{r}
+chr_vec = c("5", "8", "6", "10", "7", "9")
+```
+
+```{r}
+# You might not expect it to sort like this
+sort(chr_vec)
+```
+
+```{r}
+# If they are numbers, they sort differently
+sort(as.numeric(chr_vec))
+```
+
+### Numeric type: Precision can be dangerous...
+
+```{r}
+0.1 + 0.2 == 0.3
+```
+
+There's a website called [https://0.30000000000000004.com/](https://0.30000000000000004.com/)
+that explains this in detail.
+
+But briefly, any number that is not an integer has limited precision, and 
+[propagation of error](https://en.wikipedia.org/wiki/Propagation_of_uncertainty) is a thing.
+
+```{r}
+# A more robust way to compare non-integers
+# Define an error margin that you want to tolerate
+error_margin = 10^-8
+
+# and then decide if the difference is within the margin
+(0.1 + 0.2) - 0.3 < error_margin
+```
+
+### Factor: Ordered categories
+
+```{r}
+# Categories as characters works most of the time, but...
+month_tbl = data.frame(
+  month = c(
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ),
+  length = c(
+    31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+  )
+)
+str(month_tbl)
+```
+
+Most functions that you encounter in R will sort alphabetically for characters.
+
+```{r}
+library(ggplot2)
+month_tbl %>%
+  qplot(data = ., x = month, y = length, geom = "point") +
+  # This adjust the axis text to make the text more visible
+  theme(axis.text.x = element_text(size = 20, angle = 60, hjust = 1))
+```
+
+You won't be able to decide the order unless you convert it to a factor.
+
+```{r}
+month_tbl$month = factor(
+  month_tbl$month,
+  # R will respect the levels you set here
+  levels = c(
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  )
+)
+
+month_tbl %>%
+  qplot(data = ., x = month, y = length, geom = "point") +
+  # This adjust the axis text to make the text more visible
+  theme(axis.text.x = element_text(size = 20, angle = 60, hjust = 1))
+```
+
+Factors are more complicated than characters and numbers, so they could be 
+harder to troubleshoot, but at the same time, they are very powerful especially
+in statistics.
+
+As a rule of thumb, when you inspect your data (e.g., with `str()`), always ask
+yourself if you are having categorical variables.
+
+If you do, consider converting them to factors if:
+
+- You know they are ordinal
+
+- When you are building statistical models with categorical variables 
+(ANOVA et al.)
+
+### Date and time
+
+They have a similar issue as ordinal categories: If considered as characters, 
+they won't be ordered chronologically.
+
+```{r}
+# This shouldn't be surprising by now
+random_dates = c("12-25-2022", "07-04-1989", "01-01-2077")
+sort(random_dates)
+```
+
+Unlike most categorical variables, there are usually so many dates, so it is
+not practical for you to assign orders manually.
+
+Luckily, there is a package that will take care of this for you if you tell it
+the format of your dates.
+
+```{r}
+# You can tell R how the date is represented to chronologically sort
+library(lubridate)
+
+# mdy() stands for month, day, year
+good_dates = mdy(random_dates)
+sort(good_dates)
+```

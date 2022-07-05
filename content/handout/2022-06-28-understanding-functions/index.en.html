@@ -1,0 +1,253 @@
+---
+title: Understanding Functions
+date: '2022-06-28'
+slug: understanding-functions
+categories:
+  - Handout
+tags: []
+subtitle: ''
+summary: ''
+authors: ['cb']
+lastmod: '2022-06-28T13:42:09-04:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+
+
+<div id="review" class="section level2">
+<h2>Review</h2>
+<p>Let’s create our data frames again by running the following code:</p>
+<pre class="r"><code>NewDataFrame &lt;- data.frame(Random = c(4, 20, 10, 21, 63, 3, 14, 60, 9, 6),
+                           Index = 1:10,
+                           Categories = c(&quot;Month&quot;, &quot;Day&quot;, &quot;Month&quot;, &quot;Day&quot;, &quot;Year&quot;, 
+                                          &quot;Month&quot;, &quot;Day&quot;, &quot;Year&quot;, &quot;Month&quot;, &quot;Day&quot;))</code></pre>
+<div id="examples-for-plotting-subsetted-values" class="section level3">
+<h3>Examples for plotting subsetted values</h3>
+<p>If you wanted to plot only specific values, you could use these same booleans inside the functions to plot. This is going to be the basis of how we separate out values in our plots.</p>
+<pre class="r"><code>library(ggplot2)
+library(dplyr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code># Plot our data frame here
+qplot(x = NewDataFrame$Random, y = NewDataFrame$Index)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>qplot(x = Random, y = Index, data = NewDataFrame)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<pre class="r"><code># We can change the size of our points by adding in the &#39;size&#39; argument
+qplot(x = NewDataFrame$Random, y = NewDataFrame$Index, size = 1)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-2-3.png" width="672" /></p>
+<pre class="r"><code># Finally, we can add in coloring by a boolean logical
+qplot(x = NewDataFrame$Random, y = NewDataFrame$Index, color = NewDataFrame$Index &gt; 5, size = 1)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-2-4.png" width="672" /></p>
+<pre class="r"><code>qplot(x = NewDataFrame$Random, y = NewDataFrame$Index, color = NewDataFrame$Categories, size = 1)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-2-5.png" width="672" /></p>
+</div>
+<div id="exploring-r" class="section level3">
+<h3>Exploring R</h3>
+<p>As a reminder, we can find out more about the functions we use with the help menu, found using help() or just simply a ‘?’ in front of the function (without spaces).</p>
+<pre class="r"><code>help(qplot)
+?qplot</code></pre>
+<p>As a reminder, there’s an option for <em>geom</em>. This is the type of plot that will be made, and the default is a scatter plot (so geom = “point”). You can find this in the defaults for geom.</p>
+<pre class="r"><code>#Make a scatter plot
+qplot(x = Index, y = Random, data = NewDataFrame,
+      geom = &quot;point&quot;,
+      xlim = c(0,25), ylim = c(0,100),
+      main = &quot;Rainfall Distribution&quot;,
+      xlab = &quot;Month&quot;,
+      ylab = &quot;Rainfall (in)&quot;,
+      color = Random &gt; 5, size = 1)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>#Make a box plot with scatter (called jitter)
+qplot(x = Random, y = Categories, data = NewDataFrame,
+      geom = c(&quot;boxplot&quot;, &quot;jitter&quot;),
+      main = &quot;Boxplot of Random Numbers&quot;,
+      color = Index)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+<div id="practice-from-last-time" class="section level3">
+<h3>Practice from last time:</h3>
+<p>Load in the dataset penguins.csv, and plot the <em>bill length</em> vs <em>body mass</em> of penguins, coloring by <em>species</em> and changing the shape by <em>island</em>.</p>
+<pre class="r"><code>#Load in the csv using read.csv()
+
+#View the data by using head() and find the names of the columns using str()
+
+#Use qplot to plot the columns that you&#39;re interested in</code></pre>
+</div>
+<div id="advanced-practice" class="section level3">
+<h3>Advanced Practice</h3>
+<p>Using either dplyr or subsetting, plot the Gentoo penguins bill length vs body mass, and color by if their body mass is above 5500.</p>
+<pre class="r"><code># Your code below</code></pre>
+</div>
+</div>
+<div id="functions" class="section level2">
+<h2>Functions</h2>
+<p>We’ve been using functions throughout this course; a function is anything that has an input and an output, often changing that input to create a different output. The functions that we’ve used so far have either been built into R such as mean(), dim(), sum(), and length(), or they have been loaded in as a package, such as dplyr::filter(), dplyr::summarize(), and ggplot::qplot().</p>
+<p>Let’s now look up the help menu for the function seq(). What does it do?</p>
+<pre class="r"><code>help(seq)</code></pre>
+<p>Let’s run this function with default values:</p>
+<pre class="r"><code>#Uncomment this line to see what happens if you don&#39;t include any values:
+#seq()
+
+#Let&#39;s run this line to see what happens when you include only a single value:
+seq(5)</code></pre>
+<pre><code>## [1] 1 2 3 4 5</code></pre>
+<p>Let’s include three numbers without explicitly calling each argument:</p>
+<pre class="r"><code>seq(5,10,2)</code></pre>
+<pre><code>## [1] 5 7 9</code></pre>
+<pre class="r"><code>#This is the same as running:
+seq(from = 5, to = 10,  by = 2)</code></pre>
+<pre><code>## [1] 5 7 9</code></pre>
+<p>Let’s change up the order now:</p>
+<pre class="r"><code>#This will also produce values that are equivalent:
+seq(to = 10, by = 2, from = 5)</code></pre>
+<pre><code>## [1] 5 7 9</code></pre>
+<pre class="r"><code>#But this will not:
+#seq(10, 2, 5)</code></pre>
+<div id="practice" class="section level4">
+<h4>Practice</h4>
+<p>Save a vector of values from 12 to 200, increasing by 4. Then print the last 10 values of this vector.</p>
+<pre class="r"><code>#define your variable as the output of seq()
+
+#look at the documentation for tail()
+
+#print the last 10 values using tail()</code></pre>
+</div>
+<div id="writing-your-own-function" class="section level3">
+<h3>Writing your own function</h3>
+<p>We can write functions as well as using them. Today we’ll start off with a simple code to convert Celsius to Fahrenheit.</p>
+<pre class="r"><code>#define your variable
+celcius &lt;- 20
+
+#calculate your new value
+farenheit &lt;- 9/5 * celcius + 32
+
+#print the new value
+farenheit</code></pre>
+<pre><code>## [1] 68</code></pre>
+<p>Now let’s turn this into a function, using the function() function. Keep in mind that functions follow essentially the format of</p>
+<p><span class="math display">\[y=f(x)\]</span></p>
+<p>which can also be read as:</p>
+<p><span class="math display">\[output = myfunction(input)\]</span></p>
+<p>When we write this in code, we define the <em>name</em> of the function (below it’s c2f) as function(input){}, where inside the curly brackets {} there is the actual calculation. We then use the function return() to designate to the function what to output, which is our “y” in the above formula.</p>
+<pre class="r"><code>c2f &lt;- function(celcius) {
+  farenheit = 9/5 * celcius + 32
+  return(farenheit)
+}</code></pre>
+<p>What happens if we run this without an argument?</p>
+<pre class="r"><code>#Run the following code:
+c2f()</code></pre>
+<p>We need to include arguments for celcius:</p>
+<pre class="r"><code>#Try explicitly stating the value
+c2f(celcius = 10)</code></pre>
+<pre><code>## [1] 50</code></pre>
+<pre class="r"><code>#What happens if we don&#39;t define celcius?
+c2f(10)</code></pre>
+<pre><code>## [1] 50</code></pre>
+<p>Finally, we can actually include a default when we create this function. Let’s add in something to c2f().</p>
+<pre class="r"><code>c2f_adv &lt;- function(celcius = 0) {
+  farenheit &lt;- 9/5 * celcius + 32
+  return(farenheit)
+}
+
+#now run the code without an argument to see what happens
+c2f_adv()</code></pre>
+<pre><code>## [1] 32</code></pre>
+</div>
+<div id="functions-with-two-arguments" class="section level3">
+<h3>Functions with two arguments:</h3>
+<p>If we include x and y into the equation, we can set two variables values:</p>
+<pre class="r"><code>multiply &lt;- function(x, y){x*y}</code></pre>
+<p>Now we can run this, but it won’t work if we don’t give two arguments:</p>
+<pre class="r"><code>#This does not work without defaults
+#multiply()
+
+#This will multiply 2 and 3:
+multiply(2,3)</code></pre>
+<pre><code>## [1] 6</code></pre>
+<p>If we rewrite this function, then it will work if defaults are set:</p>
+<pre class="r"><code>multiply2 &lt;- function(x = 2, y = 4){x*y}
+
+#This will multiply the default arguments
+multiply2()</code></pre>
+<pre><code>## [1] 8</code></pre>
+<pre class="r"><code>#This will multiply the inputs
+multiply2(3,10)</code></pre>
+<pre><code>## [1] 30</code></pre>
+<pre class="r"><code>#What happens if you only include one number?
+multiply2(10)</code></pre>
+<pre><code>## [1] 40</code></pre>
+<pre class="r"><code>multiply2(y = 10)</code></pre>
+<pre><code>## [1] 20</code></pre>
+</div>
+</div>
+<div id="data-types" class="section level2">
+<h2>Data Types</h2>
+<p>So far we’ve been able to run calculations using variables, and used read.csv() to take in a character (the name of your file) that is converted into a data frame. We’ve also mentioned that data frame columns must be vectors of the same “type”. But what are the other data types that R can use?</p>
+<p><strong>Some basic data types:</strong></p>
+<ul>
+<li><p>Characters (char): “string” of text, which has the value of the text</p></li>
+<li><p>Numbers (num): overall class of numbers, which includes integers and doubles</p></li>
+<li><p>Integers (int): numbers without decimal points (takes less space)</p></li>
+<li><p>Doubles (dbl): floating point numbers, or those with precision (takes more space)</p></li>
+<li><p>Factors (fact): categorical elements which can be ordered (this sounds weird, but we’ll explain more later)</p></li>
+</ul>
+<pre class="r"><code>examplestring &lt;- &quot;This is a string of text&quot;
+exampledouble &lt;- 26.2
+exampleinteger &lt;- 5
+
+#We can find out the data types by running typeof()
+
+typeof(examplestring)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<pre class="r"><code>#What data types are exampledouble and exampleinteger?
+
+typeof(exampledouble)</code></pre>
+<pre><code>## [1] &quot;double&quot;</code></pre>
+<pre class="r"><code>typeof(exampleinteger)</code></pre>
+<pre><code>## [1] &quot;double&quot;</code></pre>
+<pre class="r"><code>#Notice that exampleinteger is also listed as a double; this is because R will automatically store numbers as doubles, and converts between numeric classes automatically
+
+realinteger &lt;- as.integer(exampleinteger)
+typeof(realinteger)</code></pre>
+<pre><code>## [1] &quot;integer&quot;</code></pre>
+<p>When plotting, data types will change how plots view your data. For example, characters will often be unique values without order, numbers will often be continuous rather than discrete, and ordered alphabetically, and factors will be discrete and maintain an order. We will learn more about this soon, but we can use an example with qplot (which we’ve reviewed).</p>
+<pre class="r"><code>penguins &lt;- read.csv(&quot;penguins.csv&quot;)
+# How many colors are there when we color by island?
+qplot(x = bill_length_mm, y = bill_depth_mm, data = penguins, color = island)</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+<pre class="r"><code># How many colors are there when we color by bill depth?
+qplot(x = bill_length_mm, y = bill_depth_mm, data = penguins, color = bill_depth_mm)</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-22-2.png" width="672" /></p>
+<hr />
+<div id="answers-to-practice-problems" class="section level3">
+<h3>Answers to practice problems</h3>
+<pre><code>## &#39;data.frame&#39;:    344 obs. of  8 variables:
+##  $ species          : chr  &quot;Adelie&quot; &quot;Adelie&quot; &quot;Adelie&quot; &quot;Adelie&quot; ...
+##  $ island           : chr  &quot;Torgersen&quot; &quot;Torgersen&quot; &quot;Torgersen&quot; &quot;Torgersen&quot; ...
+##  $ bill_length_mm   : num  39.1 39.5 40.3 NA 36.7 39.3 38.9 39.2 34.1 42 ...
+##  $ bill_depth_mm    : num  18.7 17.4 18 NA 19.3 20.6 17.8 19.6 18.1 20.2 ...
+##  $ flipper_length_mm: int  181 186 195 NA 193 190 181 195 193 190 ...
+##  $ body_mass_g      : int  3750 3800 3250 NA 3450 3650 3625 4675 3475 4250 ...
+##  $ sex              : chr  &quot;male&quot; &quot;female&quot; &quot;female&quot; NA ...
+##  $ year             : int  2007 2007 2007 2007 2007 2007 2007 2007 2007 2007 ...</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-24-2.png" width="672" /></p>
+</div>
+</div>

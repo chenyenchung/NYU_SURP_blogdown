@@ -51,6 +51,24 @@
   url = "assets/session4.zip"
   
 [[main]]
+  name = "Session 5"
+  weight = 50
+  parent = "wsd"
+  url = "assets/session5.zip"
+  
+[[main]]
+  name = "Session 6"
+  weight = 60
+  parent = "wsd"
+  url = "assets/session6.zip"
+  
+[[main]]
+  name = "Session 7"
+  weight = 70
+  parent = "wsd"
+  url = "assets/session7.zip"
+  
+[[main]]
   name = "Slide Deck"
   weight = 40
   identifier = "slides"
@@ -66,6 +84,12 @@
   parent = "slides"
   weight = 20
   url = "slides/session_2/session_2_EDA_summary.html"
+  
+[[main]]
+  name = "Session 6: Functions and Data Types"
+  parent = "slides"
+  weight = 20
+  url = "slides/session_6/function_and_data_types.html"
   
 # [[main]]
 # name = "Full Publications"
