@@ -1,0 +1,337 @@
+---
+title: Understanding Functions
+date: '2022-06-28'
+slug: understanding-functions
+categories:
+  - Handout
+tags: []
+subtitle: ''
+summary: ''
+authors: ['cb']
+lastmod: '2022-06-28T13:42:09-04:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+## Review
+
+Let's create our data frames again by running the following code:
+
+```{r}
+NewDataFrame <- data.frame(Random = c(4, 20, 10, 21, 63, 3, 14, 60, 9, 6),
+                           Index = 1:10,
+                           Categories = c("Month", "Day", "Month", "Day", "Year", 
+                                          "Month", "Day", "Year", "Month", "Day"))
+```
+
+### Examples for plotting subsetted values
+
+If you wanted to plot only specific values, you could use these same booleans inside the functions to plot. This is going to be the basis of how we separate out values in our plots.
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# Plot our data frame here
+qplot(x = NewDataFrame$Random, y = NewDataFrame$Index)
+
+qplot(x = Random, y = Index, data = NewDataFrame)
+
+# We can change the size of our points by adding in the 'size' argument
+qplot(x = NewDataFrame$Random, y = NewDataFrame$Index, size = 1)
+
+# Finally, we can add in coloring by a boolean logical
+qplot(x = NewDataFrame$Random, y = NewDataFrame$Index, color = NewDataFrame$Index > 5, size = 1)
+qplot(x = NewDataFrame$Random, y = NewDataFrame$Index, color = NewDataFrame$Categories, size = 1)
+
+```
+
+### Exploring R
+
+As a reminder, we can find out more about the functions we use with the help menu, found using help() or just simply a '?' in front of the function (without spaces).
+
+```{r, eval = FALSE}
+help(qplot)
+?qplot
+```
+
+
+As a reminder, there's an option for _geom_. This is the type of plot that will be made, and the default is a scatter plot (so geom = "point"). You can find this in the defaults for geom.
+
+```{r}
+#Make a scatter plot
+qplot(x = Index, y = Random, data = NewDataFrame,
+      geom = "point",
+      xlim = c(0,25), ylim = c(0,100),
+      main = "Rainfall Distribution",
+      xlab = "Month",
+      ylab = "Rainfall (in)",
+      color = Random > 5, size = 1)
+```
+
+```{r}
+#Make a box plot with scatter (called jitter)
+qplot(x = Random, y = Categories, data = NewDataFrame,
+      geom = c("boxplot", "jitter"),
+      main = "Boxplot of Random Numbers",
+      color = Index)
+
+```
+
+### Practice from last time:
+
+Load in the dataset penguins.csv, and plot the _bill length_ vs _body mass_ of penguins, coloring by _species_ and changing the shape by _island_.
+
+```{r}
+#Load in the csv using read.csv()
+
+#View the data by using head() and find the names of the columns using str()
+
+#Use qplot to plot the columns that you're interested in
+
+
+```
+
+### Advanced Practice
+
+Using either dplyr or subsetting, plot the Gentoo penguins bill length vs body mass, and color by if their body mass is above 5500.
+
+```{r}
+# Your code below
+
+```
+
+
+## Functions
+
+We've been using functions throughout this course; a function is anything that has an input and an output, often changing that input to create a different output. The functions that we've used so far have either been built into R such as mean(), dim(), sum(), and length(), or they have been loaded in as a package, such as dplyr::filter(), dplyr::summarize(), and ggplot::qplot().
+
+Let's now look up the help menu for the function seq(). What does it do?
+
+```{r, eval = FALSE}
+help(seq)
+```
+
+Let's run this function with default values:
+
+```{r}
+#Uncomment this line to see what happens if you don't include any values:
+#seq()
+
+#Let's run this line to see what happens when you include only a single value:
+seq(5)
+
+```
+Let's include three numbers without explicitly calling each argument:
+
+```{r}
+seq(5,10,2)
+
+#This is the same as running:
+seq(from = 5, to = 10,  by = 2)
+
+```
+Let's change up the order now:
+
+```{r}
+#This will also produce values that are equivalent:
+seq(to = 10, by = 2, from = 5)
+
+#But this will not:
+#seq(10, 2, 5)
+```
+
+#### Practice
+
+Save a vector of values from 12 to 200, increasing by 4. Then print the last 10 values of this vector.
+
+```{r}
+#define your variable as the output of seq()
+
+#look at the documentation for tail()
+
+#print the last 10 values using tail()
+
+```
+
+### Writing your own function
+
+We can write functions as well as using them. Today we'll start off with a simple code to convert Celsius to Fahrenheit. 
+
+```{r}
+#define your variable
+celcius <- 20
+
+#calculate your new value
+farenheit <- 9/5 * celcius + 32
+
+#print the new value
+farenheit
+```
+
+Now let's turn this into a function, using the function() function. Keep in mind that functions follow essentially the format of 
+
+$$y=f(x)$$
+
+which can also be read as:
+
+$$output = myfunction(input)$$
+
+When we write this in code, we define the _name_ of the function (below it's c2f) as function(input){}, where inside the curly brackets {} there is the actual calculation. We then use the function return() to designate to the function what to output, which is our "y" in the above formula.
+
+```{r}
+c2f <- function(celcius) {
+  farenheit = 9/5 * celcius + 32
+  return(farenheit)
+}
+
+```
+
+What happens if we run this without an argument?
+
+```{r, error = TRUE}
+
+#Run the following code:
+c2f()
+
+```
+
+We need to include arguments for celcius:
+
+```{r}
+#Try explicitly stating the value
+c2f(celcius = 10)
+
+#What happens if we don't define celcius?
+c2f(10)
+
+```
+
+Finally, we can actually include a default when we create this function. Let's add in something to c2f().
+
+```{r}
+c2f_adv <- function(celcius = 0) {
+  farenheit <- 9/5 * celcius + 32
+  return(farenheit)
+}
+
+#now run the code without an argument to see what happens
+c2f_adv()
+
+```
+
+
+### Functions with two arguments:
+
+If we include x and y into the equation, we can set two variables values:
+
+```{r}
+multiply <- function(x, y){x*y}
+```
+
+Now we can run this, but it won't work if we don't give two arguments:
+
+```{r}
+#This does not work without defaults
+#multiply()
+
+#This will multiply 2 and 3:
+multiply(2,3)
+```
+
+If we rewrite this function, then it will work if defaults are set:
+
+```{r}
+multiply2 <- function(x = 2, y = 4){x*y}
+
+#This will multiply the default arguments
+multiply2()
+
+#This will multiply the inputs
+multiply2(3,10)
+
+#What happens if you only include one number?
+multiply2(10)
+
+multiply2(y = 10)
+```
+
+## Data Types
+
+So far we've been able to run calculations using variables, and used read.csv() to take in a character (the name of your file) that is converted into a data frame. We've also mentioned that data frame columns must be vectors of the same "type". But what are the other data types that R can use?
+
+**Some basic data types:**
+
+* Characters (char): "string" of text, which has the value of the text
+
+* Numbers (num): overall class of numbers, which includes integers and doubles
+* Integers (int): numbers without decimal points (takes less space)
+* Doubles (dbl): floating point numbers, or those with precision (takes more space)
+
+* Factors (fact): categorical elements which can be ordered (this sounds weird, but we'll explain more later)
+
+```{r}
+examplestring <- "This is a string of text"
+exampledouble <- 26.2
+exampleinteger <- 5
+
+#We can find out the data types by running typeof()
+
+typeof(examplestring)
+
+#What data types are exampledouble and exampleinteger?
+
+typeof(exampledouble)
+typeof(exampleinteger)
+
+#Notice that exampleinteger is also listed as a double; this is because R will automatically store numbers as doubles, and converts between numeric classes automatically
+
+realinteger <- as.integer(exampleinteger)
+typeof(realinteger)
+
+```
+
+When plotting, data types will change how plots view your data. For example, characters will often be unique values without order, numbers will often be continuous rather than discrete, and ordered alphabetically, and factors will be discrete and maintain an order. We will learn more about this soon, but we can use an example with qplot (which we've reviewed).
+
+```{r}
+penguins <- read.csv("penguins.csv")
+# How many colors are there when we color by island?
+qplot(x = bill_length_mm, y = bill_depth_mm, data = penguins, color = island)
+
+# How many colors are there when we color by bill depth?
+qplot(x = bill_length_mm, y = bill_depth_mm, data = penguins, color = bill_depth_mm)
+```
+
+***
+
+### Answers to practice problems
+
+```{r, echo = FALSE}
+#Load in the csv using read.csv()
+penguins <- read.csv("penguins.csv")
+
+#View the data by using head() and find the names of the columns using str()
+str(penguins)
+
+#Use qplot to plot the columns that you're interested in
+qplot(bill_length_mm, body_mass_g, data = penguins,
+      color = species, shape = island)
+
+```
+
+```{r, echo = FALSE}
+#ADVANCED PRACTICE
+# Using dplyr to subset
+
+penguins %>% filter(species == "Gentoo") %>% qplot(x = bill_length_mm, y = body_mass_g, data = ., color = body_mass_g > 5500)
+
+#Using square brackets to subset
+
+qplot(bill_length_mm, body_mass_g, data = penguins[penguins$species == "Gentoo",],
+      color = body_mass_g > 5500, shape = island)
+```
+
