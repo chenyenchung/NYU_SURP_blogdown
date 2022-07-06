@@ -1,0 +1,301 @@
+---
+title: Introduction to ggplot2
+date: '2022-07-05'
+slug: intro-ggplot
+categories: ['Handout']
+tags: []
+subtitle: ''
+summary: ''
+authors: ['cb']
+lastmod: '2022-07-05T22:31:25-06:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+
+
+<div id="review" class="section level2">
+<h2>Review</h2>
+<p>A quick review before we get into more complicated exercises:</p>
+<pre class="r"><code>#We can create a data frame using the c() function
+
+myplants &lt;- data.frame(Plants = c(&quot;Aloe&quot;, &quot;Pothos&quot;, &quot;Spider&quot;, &quot;ZZ&quot;, &quot;Snake&quot;, 
+                                &quot;Aloe&quot;, &quot;Pothos&quot;, &quot;Spider&quot;, &quot;ZZ&quot;, &quot;Snake&quot;),
+                     Growth = c(1.2, 2.2, 3.1, 1.4, 5.7, 3.4, 1.9, 2.5, 1.2, 5.3),
+                     Water = c(1,1,1,1,1,2,2,2,2,2))
+
+#View Data using head() or str()
+head(myplants)</code></pre>
+<pre><code>##   Plants Growth Water
+## 1   Aloe    1.2     1
+## 2 Pothos    2.2     1
+## 3 Spider    3.1     1
+## 4     ZZ    1.4     1
+## 5  Snake    5.7     1
+## 6   Aloe    3.4     2</code></pre>
+<pre class="r"><code>#We can use square brackets and $ to select columns and rows of a data frame
+myplants[myplants$Growth &gt; 2,]</code></pre>
+<pre><code>##    Plants Growth Water
+## 2  Pothos    2.2     1
+## 3  Spider    3.1     1
+## 5   Snake    5.7     1
+## 6    Aloe    3.4     2
+## 8  Spider    2.5     2
+## 10  Snake    5.3     2</code></pre>
+<pre class="r"><code>#We can use dplyr to filter for this same Growth
+myplants %&gt;% filter(Growth &gt; 2)</code></pre>
+<pre><code>##   Plants Growth Water
+## 1 Pothos    2.2     1
+## 2 Spider    3.1     1
+## 3  Snake    5.7     1
+## 4   Aloe    3.4     2
+## 5 Spider    2.5     2
+## 6  Snake    5.3     2</code></pre>
+<pre class="r"><code>#If we wanted to count how many elements in a vector satisfy this, 
+#we could sum a logical. First print the logical, then find the sum
+# myplants$Growth &gt; 2
+sum(myplants$Growth &gt; 2)</code></pre>
+<pre><code>## [1] 6</code></pre>
+<pre class="r"><code>#Using dplyr, we could use the count() function to find this same thing
+myplants %&gt;% count(Growth &gt; 2)</code></pre>
+<pre><code>##   Growth &gt; 2 n
+## 1      FALSE 4
+## 2       TRUE 6</code></pre>
+<pre class="r"><code>myplants %&gt;% filter(Growth &gt; 2) %&gt;% count()</code></pre>
+<pre><code>##   n
+## 1 6</code></pre>
+<pre class="r"><code>#If we wanted to make a new data frame for just the Pothos plants, 
+# we could assign using the &#39;&lt;-&#39; sign
+pothos_plants &lt;- myplants[myplants$Plants == &quot;Pothos&quot;,]
+
+# Finally, if we wanted to use the qplot function to plot the data, we could do 
+# so as follows:
+qplot(Plants, Growth, data = myplants, color = Water, size = I(5))</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>Work in pairs. Let’s answer a few questions to remind ourselves how functions, indexing, and dplyr all work:</p>
+<pre class="r"><code>#Load in the dplyr library if you haven&#39;t already
+library(dplyr)
+
+#Read in your penguins dataset
+penguins = read.csv(&quot;penguins.csv&quot;)
+
+#Using square brackets, make a new data frame for female Adelie penguins
+adelie_f = filter(penguins, sex == &quot;Female&quot;, species == &quot;Adelie&quot;)
+
+#Using dplyr, count how many Adelie female penguins are in each island
+adelie_f %&gt;% count(island)</code></pre>
+<pre><code>## [1] island n     
+## &lt;0 rows&gt; (or 0-length row.names)</code></pre>
+<pre class="r"><code>#Using dplyr, make another data frame for male Gentoo penguins
+gentoo_m = filter(penguins, sex == &quot;Male&quot;, species == &quot;Gentoo&quot;)
+
+#Without using dplyr, count how many Gentoo male penguins are on 
+#the island Biscoe
+sum(gentoo_m$island == &quot;Biscoe&quot;)</code></pre>
+<pre><code>## [1] 0</code></pre>
+</div>
+<div id="ggplot2-grammar-of-graphics" class="section level2">
+<h2>Ggplot2: Grammar of Graphics</h2>
+<p>This package ggplot2 provides a base plotting function (qplot) as well as the function ggplot() to take in data and many (many) geoms to specify the plot. We’ve only used qplot, or quickplot, up until this point, but as your analysis becomes more specific and you start to tell the story of your data, you’ll want to customize.</p>
+<div id="scatter-plots-using-geom_point" class="section level3">
+<h3>Scatter Plots using geom_point()</h3>
+<p>Let’s start with a scatter plot, since this is the default for qplot() with two axes.</p>
+<pre class="r"><code>ggplot(data = penguins, aes(x = bill_length_mm, y = flipper_length_mm)) + 
+  geom_point()</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(
+  data = penguins,
+  aes(x = bill_length_mm, y = flipper_length_mm, color = species)
+) + 
+  geom_point()</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+</div>
+</div>
+<div id="practice" class="section level2">
+<h2>Practice</h2>
+<pre class="r"><code>#Try plotting the flipper length and body mass using geom_point(), 
+# and then coloring points by sex
+penguins %&gt;%
+  ggplot(data = ., aes(x = flipper_length_mm, y = body_mass_g, color = sex)) +
+  geom_point()</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>There are several other options for a ggplot that can be added in using ‘+’. These include ggtitle, xlim and ylim, labels, and themes. Below we’ll add a title and change the x and y axis labels.</p>
+<pre class="r"><code>#First, we can look up one of the functions within ggplot2 called ggtitle, 
+#which will have our labeling functions. Because these are each their own 
+#function, we won&#39;t get the information from the help menu of ggplot() on its 
+#own, but this is where Googling the usage would be beneficial.
+
+?ggtitle</code></pre>
+<pre class="r"><code>#Next let&#39;s add these labels to our plot. Notice that each line ends in a &#39;+&#39;
+
+ggplot(
+  data = penguins,
+  aes(x = bill_length_mm, y = flipper_length_mm, color = species)
+) + 
+  geom_point() +
+  ggtitle(&quot;Penguin Bill vs Flipper Length&quot;) +
+  xlab(&quot;Bill Length (mm)&quot;) +
+  ylab(&quot;Flipper Length (mm)&quot;)</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<div id="changing-alpha-and-size" class="section level3">
+<h3>Changing alpha and size</h3>
+<p>Notice that the aes() argument gives us the columns that we’re using in our plot, and that we don’t have anything yet inside the function of geom_point(). Let’s look at the documentation for geom_point() to see our options.</p>
+<pre class="r"><code>#How do we find the help menu?
+help(geom_point)
+#Scroll down to the &quot;Aesthetics&quot; section; what do you find?
+
+#Scroll down to the &quot;Examples&quot; section - how would you set your aesthetics to a fixed value?</code></pre>
+<p>If we don’t specify a column for the aesthetics within geom_point(), we can set them to a fixed value. This will help us change the shape, size, color, and alpha of our plot.</p>
+<pre class="r"><code>#Changing the size to larger
+ggplot(
+  data = penguins, aes(x = bill_length_mm, y = flipper_length_mm, color = species)
+) + 
+  geom_point(size = 4)</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre class="r"><code>#Changing the transparency (alpha) to lighter
+ggplot(
+  data = penguins, aes(x = bill_length_mm, y = flipper_length_mm, color = species)
+) + 
+  geom_point(alpha = 0.5)</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-9-2.png" width="672" /></p>
+<p>We can combine both of these values to make larger more transparent points on our plot by separating arguments with a comma. We can also change the shape.</p>
+<pre class="r"><code>ggplot(
+  data = penguins,
+  aes(x = bill_length_mm, y = flipper_length_mm, color = species)
+) + 
+  geom_point(size = 4, alpha = 0.5)</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>If we wanted all of the points to be the same color, not based on a variable, we would put this argument in the geom_point() function rather than inside aes().</p>
+<pre class="r"><code>ggplot(
+  data = penguins,
+  aes(x = bill_length_mm, y = flipper_length_mm)
+) + 
+  geom_point(size = 4, alpha = 0.5, color = &quot;red&quot;)</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>If we wanted to change the shape of our points by our species column, how would we do this?</p>
+<pre class="r"><code># CHANGE THE FOLLOWING CODE to make **shape** rather than **color** vary by species.
+
+ggplot(
+  data = penguins,
+  aes(x = bill_length_mm, y = flipper_length_mm, color = species)
+) + 
+  geom_point(size = 4,alpha = 0.5)</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+</div>
+<div id="density-plots-using-geom_density" class="section level3">
+<h3>Density Plots using geom_density()</h3>
+<p>Let’s say that instead of a scatter plot, you wanted to know the distributions of your numeric data. In this case, you could use the geom_density() function to plot this, but your arguments would be different since the default for your y axis will be density.</p>
+<pre class="r"><code>#First define your data, then aesthetics (aes), 
+# and finally add on your geom at the end
+ggplot(data = penguins, aes(x = flipper_length_mm, color = species)) + geom_density()</code></pre>
+<pre><code>## Warning: Removed 2 rows containing non-finite values (stat_density).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+</div>
+</div>
+<div id="practice-1" class="section level2">
+<h2>Practice</h2>
+<pre class="r"><code>#On your own, add the title and x and y labels to your density plot.
+ggplot(data = penguins, aes(x = flipper_length_mm, color = species)) + 
+  geom_density() +
+  labs(title = &quot;Numeric data&quot;, x = &quot;Flipper Length (mm)&quot;, y = &quot;Density&quot;)</code></pre>
+<pre><code>## Warning: Removed 2 rows containing non-finite values (stat_density).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<pre class="r"><code># Next, see what the &quot;size&quot; function does if you add that to geom_density().
+# Set the size to 2.
+ggplot(data = penguins, aes(x = flipper_length_mm, color = species)) + 
+  geom_density(size = 2) +
+  labs(title = &quot;Numeric data&quot;, x = &quot;Flipper Length (mm)&quot;, y = &quot;Density&quot;)</code></pre>
+<pre><code>## Warning: Removed 2 rows containing non-finite values (stat_density).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-14-2.png" width="672" /></p>
+<p>Let’s instead use “fill” instead of “color” for our density plot.</p>
+<pre class="r"><code># Notice that the argument after x is fill, rather than color
+# (which we&#39;ve used before)
+
+ggplot(data = penguins, aes(x = flipper_length_mm, fill = species)) + geom_density()</code></pre>
+<pre><code>## Warning: Removed 2 rows containing non-finite values (stat_density).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p>Next, let’s add transparency. What would we change about the following code to do this?</p>
+<pre class="r"><code>#Once again, we can change the transparency of our plot
+
+ggplot(data = penguins, aes(x = flipper_length_mm, fill = species)) + geom_density()</code></pre>
+<div id="practice-exercise" class="section level3">
+<h3>Practice Exercise</h3>
+<p>With a partner, let’s make a scatter plot and two density plots of two numeric variables; make one scatter plot looking at the correlation between the two, and then a density plot for each variable that you choose. Color based on a categorical variable.</p>
+<pre class="r"><code>#Use head() or str() to find the variables that are numeric
+str(penguins)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    344 obs. of  8 variables:
+##  $ species          : chr  &quot;Adelie&quot; &quot;Adelie&quot; &quot;Adelie&quot; &quot;Adelie&quot; ...
+##  $ island           : chr  &quot;Torgersen&quot; &quot;Torgersen&quot; &quot;Torgersen&quot; &quot;Torgersen&quot; ...
+##  $ bill_length_mm   : num  39.1 39.5 40.3 NA 36.7 39.3 38.9 39.2 34.1 42 ...
+##  $ bill_depth_mm    : num  18.7 17.4 18 NA 19.3 20.6 17.8 19.6 18.1 20.2 ...
+##  $ flipper_length_mm: int  181 186 195 NA 193 190 181 195 193 190 ...
+##  $ body_mass_g      : int  3750 3800 3250 NA 3450 3650 3625 4675 3475 4250 ...
+##  $ sex              : chr  &quot;male&quot; &quot;female&quot; &quot;female&quot; NA ...
+##  $ year             : int  2007 2007 2007 2007 2007 2007 2007 2007 2007 2007 ...</code></pre>
+<pre class="r"><code>#Make a scatter plot of the two variables using geom_point()
+penguins %&gt;%
+  ggplot(data = ., aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point()</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<pre class="r"><code>#Add a color to separate the categorical variable
+penguins %&gt;%
+  ggplot(data = ., aes(
+    x = bill_length_mm, y = bill_depth_mm, color = island
+  )) +
+  geom_point()</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-17-2.png" width="672" /></p>
+<pre class="r"><code>#Add axis labels and a title to your plot
+penguins %&gt;%
+  ggplot(data = ., aes(
+    x = bill_length_mm, y = bill_depth_mm, color = island
+  )) +
+  geom_point() +
+  labs(
+    title = &quot;Bill metric correlation&quot;,
+    x = &quot;Bill Length (mm)&quot;,
+    y = &quot;Bill depth (mm)&quot;
+  )</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-17-3.png" width="672" /></p>
+<pre class="r"><code>#Make a density plot using geom_density()
+penguins %&gt;%
+  ggplot(data = ., aes(
+    x = bill_length_mm,
+  )) +
+  geom_density()</code></pre>
+<pre><code>## Warning: Removed 2 rows containing non-finite values (stat_density).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-17-4.png" width="672" /></p>
+<pre class="r"><code>penguins %&gt;%
+  ggplot(data = ., aes(
+    x = bill_depth_mm
+  )) +
+  geom_density()</code></pre>
+<pre><code>## Warning: Removed 2 rows containing non-finite values (stat_density).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-17-5.png" width="672" /></p>
+<pre class="r"><code>#Add axis labels and a title to your plot
+penguins %&gt;%
+  ggplot(data = ., aes(
+    x = bill_length_mm,
+  )) +
+  geom_density() + 
+  labs(main = &quot;My ggplot (don&#39;t name it like this)&quot;, x = &quot;Bill Lenth (mm)&quot;)</code></pre>
+<pre><code>## Warning: Removed 2 rows containing non-finite values (stat_density).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-17-6.png" width="672" /></p>
+<pre class="r"><code>#Share with the class which variables you chose and what your plots looked like</code></pre>
+</div>
+</div>
