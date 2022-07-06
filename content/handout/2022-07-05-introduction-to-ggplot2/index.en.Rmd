@@ -1,0 +1,315 @@
+---
+title: Introduction to ggplot2
+date: '2022-07-05'
+slug: intro-ggplot
+categories: ['Handout']
+tags: []
+subtitle: ''
+summary: ''
+authors: ['cb']
+lastmod: '2022-07-05T22:31:25-06:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+## Review
+
+A quick review before we get into more complicated exercises:
+
+```{r, include = FALSE}
+#Load in dplyr and ggplot2
+library(dplyr)
+library(ggplot2)
+```
+
+```{r}
+#We can create a data frame using the c() function
+
+myplants <- data.frame(Plants = c("Aloe", "Pothos", "Spider", "ZZ", "Snake", 
+                                "Aloe", "Pothos", "Spider", "ZZ", "Snake"),
+                     Growth = c(1.2, 2.2, 3.1, 1.4, 5.7, 3.4, 1.9, 2.5, 1.2, 5.3),
+                     Water = c(1,1,1,1,1,2,2,2,2,2))
+
+#View Data using head() or str()
+head(myplants)
+
+#We can use square brackets and $ to select columns and rows of a data frame
+myplants[myplants$Growth > 2,]
+
+#We can use dplyr to filter for this same Growth
+myplants %>% filter(Growth > 2)
+
+#If we wanted to count how many elements in a vector satisfy this, 
+#we could sum a logical. First print the logical, then find the sum
+# myplants$Growth > 2
+sum(myplants$Growth > 2)
+
+#Using dplyr, we could use the count() function to find this same thing
+myplants %>% count(Growth > 2)
+myplants %>% filter(Growth > 2) %>% count()
+
+#If we wanted to make a new data frame for just the Pothos plants, 
+# we could assign using the '<-' sign
+pothos_plants <- myplants[myplants$Plants == "Pothos",]
+
+# Finally, if we wanted to use the qplot function to plot the data, we could do 
+# so as follows:
+qplot(Plants, Growth, data = myplants, color = Water, size = I(5))
+```
+
+Work in pairs. Let's answer a few questions to remind ourselves how functions, indexing, and dplyr all work:
+
+```{r}
+#Load in the dplyr library if you haven't already
+library(dplyr)
+
+#Read in your penguins dataset
+penguins = read.csv("penguins.csv")
+
+#Using square brackets, make a new data frame for female Adelie penguins
+adelie_f = filter(penguins, sex == "Female", species == "Adelie")
+
+#Using dplyr, count how many Adelie female penguins are in each island
+adelie_f %>% count(island)
+
+#Using dplyr, make another data frame for male Gentoo penguins
+gentoo_m = filter(penguins, sex == "Male", species == "Gentoo")
+
+#Without using dplyr, count how many Gentoo male penguins are on 
+#the island Biscoe
+sum(gentoo_m$island == "Biscoe")
+
+```
+
+
+## Ggplot2: Grammar of Graphics
+
+This package ggplot2 provides a base plotting function (qplot) as well as the function ggplot() to take in data and many (many) geoms to specify the plot. We've only used qplot, or quickplot, up until this point, but as your analysis becomes more specific and you start to tell the story of your data, you'll want to customize.
+
+### Scatter Plots using geom_point()
+
+Let's start with a scatter plot, since this is the default for qplot() with two axes.
+
+```{r}
+
+ggplot(data = penguins, aes(x = bill_length_mm, y = flipper_length_mm)) + 
+  geom_point()
+
+ggplot(
+  data = penguins,
+  aes(x = bill_length_mm, y = flipper_length_mm, color = species)
+) + 
+  geom_point()
+
+```
+
+## Practice 
+
+```{r}
+#Try plotting the flipper length and body mass using geom_point(), 
+# and then coloring points by sex
+penguins %>%
+  ggplot(data = ., aes(x = flipper_length_mm, y = body_mass_g, color = sex)) +
+  geom_point()
+
+```
+
+There are several other options for a ggplot that can be added in using '+'. These include ggtitle, xlim and ylim, labels, and themes. Below we'll add a title and change the x and y axis labels.
+
+```{r, eval = FALSE}
+#First, we can look up one of the functions within ggplot2 called ggtitle, 
+#which will have our labeling functions. Because these are each their own 
+#function, we won't get the information from the help menu of ggplot() on its 
+#own, but this is where Googling the usage would be beneficial.
+
+?ggtitle
+
+```
+
+```{r}
+#Next let's add these labels to our plot. Notice that each line ends in a '+'
+
+ggplot(
+  data = penguins,
+  aes(x = bill_length_mm, y = flipper_length_mm, color = species)
+) + 
+  geom_point() +
+  ggtitle("Penguin Bill vs Flipper Length") +
+  xlab("Bill Length (mm)") +
+  ylab("Flipper Length (mm)")
+
+```
+
+### Changing alpha and size
+
+Notice that the aes() argument gives us the columns that we're using in our plot, and that we don't have anything yet inside the function of geom_point(). Let's look at the documentation for geom_point() to see our options.
+
+```{r}
+#How do we find the help menu?
+help(geom_point)
+#Scroll down to the "Aesthetics" section; what do you find?
+
+#Scroll down to the "Examples" section - how would you set your aesthetics to a fixed value?
+
+```
+
+If we don't specify a column for the aesthetics within geom_point(), we can set them to a fixed value. This will help us change the shape, size, color, and alpha of our plot.
+
+```{r}
+#Changing the size to larger
+ggplot(
+  data = penguins, aes(x = bill_length_mm, y = flipper_length_mm, color = species)
+) + 
+  geom_point(size = 4)
+
+#Changing the transparency (alpha) to lighter
+ggplot(
+  data = penguins, aes(x = bill_length_mm, y = flipper_length_mm, color = species)
+) + 
+  geom_point(alpha = 0.5)
+  
+```
+
+We can combine both of these values to make larger more transparent points on our plot by separating arguments with a comma. We can also change the shape.
+
+```{r}
+ggplot(
+  data = penguins,
+  aes(x = bill_length_mm, y = flipper_length_mm, color = species)
+) + 
+  geom_point(size = 4, alpha = 0.5)
+
+```
+
+If we wanted all of the points to be the same color, not based on a variable, we would put this argument in the geom_point() function rather than inside aes().
+
+```{r}
+ggplot(
+  data = penguins,
+  aes(x = bill_length_mm, y = flipper_length_mm)
+) + 
+  geom_point(size = 4, alpha = 0.5, color = "red")
+
+```
+
+If we wanted to change the shape of our points by our species column, how would we do this?
+
+```{r}
+# CHANGE THE FOLLOWING CODE to make **shape** rather than **color** vary by species.
+
+ggplot(
+  data = penguins,
+  aes(x = bill_length_mm, y = flipper_length_mm, color = species)
+) + 
+  geom_point(size = 4,alpha = 0.5)
+
+```
+
+
+### Density Plots using geom_density()
+
+Let's say that instead of a scatter plot, you wanted to know the distributions of your numeric data. In this case, you could use the geom_density() function to plot this, but your arguments would be different since the default for your y axis will be density.
+
+```{r}
+#First define your data, then aesthetics (aes), 
+# and finally add on your geom at the end
+ggplot(data = penguins, aes(x = flipper_length_mm, color = species)) + geom_density()
+
+```
+
+## Practice
+
+```{r}
+#On your own, add the title and x and y labels to your density plot.
+ggplot(data = penguins, aes(x = flipper_length_mm, color = species)) + 
+  geom_density() +
+  labs(title = "Numeric data", x = "Flipper Length (mm)", y = "Density")
+
+# Next, see what the "size" function does if you add that to geom_density().
+# Set the size to 2.
+ggplot(data = penguins, aes(x = flipper_length_mm, color = species)) + 
+  geom_density(size = 2) +
+  labs(title = "Numeric data", x = "Flipper Length (mm)", y = "Density")
+```
+
+Let's instead use "fill" instead of "color" for our density plot.
+
+```{r}
+# Notice that the argument after x is fill, rather than color
+# (which we've used before)
+
+ggplot(data = penguins, aes(x = flipper_length_mm, fill = species)) + geom_density()
+
+```
+
+Next, let's add transparency. What would we change about the following code to do this?
+
+```{r, eval = FALSE}
+#Once again, we can change the transparency of our plot
+
+ggplot(data = penguins, aes(x = flipper_length_mm, fill = species)) + geom_density()
+
+```
+
+
+### Practice Exercise
+
+With a partner, let's make a scatter plot and two density plots of two numeric variables; make one scatter plot looking at the correlation between the two, and then a density plot for each variable that you choose. Color based on a categorical variable.
+
+```{r}
+#Use head() or str() to find the variables that are numeric
+str(penguins)
+
+#Make a scatter plot of the two variables using geom_point()
+penguins %>%
+  ggplot(data = ., aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point()
+
+#Add a color to separate the categorical variable
+penguins %>%
+  ggplot(data = ., aes(
+    x = bill_length_mm, y = bill_depth_mm, color = island
+  )) +
+  geom_point()
+
+#Add axis labels and a title to your plot
+penguins %>%
+  ggplot(data = ., aes(
+    x = bill_length_mm, y = bill_depth_mm, color = island
+  )) +
+  geom_point() +
+  labs(
+    title = "Bill metric correlation",
+    x = "Bill Length (mm)",
+    y = "Bill depth (mm)"
+  )
+
+#Make a density plot using geom_density()
+penguins %>%
+  ggplot(data = ., aes(
+    x = bill_length_mm,
+  )) +
+  geom_density()
+
+penguins %>%
+  ggplot(data = ., aes(
+    x = bill_depth_mm
+  )) +
+  geom_density()
+
+#Add axis labels and a title to your plot
+penguins %>%
+  ggplot(data = ., aes(
+    x = bill_length_mm,
+  )) +
+  geom_density() + 
+  labs(main = "My ggplot (don't name it like this)", x = "Bill Lenth (mm)")
+
+#Share with the class which variables you chose and what your plots looked like
+
+```
+
+
