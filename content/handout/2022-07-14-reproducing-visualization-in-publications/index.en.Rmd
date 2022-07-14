@@ -1,0 +1,671 @@
+---
+title: Reproducing Visualization in Publications
+date: '2022-07-14'
+slug: reproducing-visualization-in-publications
+categories: ['handout']
+tags: []
+subtitle: ''
+summary: ''
+authors: ['ycc']
+lastmod: '2022-07-14T17:16:29-04:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+```
+
+## Quick recap/practice
+
+To warm up, we're going to use one of Cassandra's data sets, which has chromosome positions and z-scores. We'll do each of these exercises together.
+
+```{r fig.width = 10, fig.height = 3}
+# Load in the data
+BSAResults = read.csv("data/BSAResults.csv")
+
+# Find the unique values of the chromosomes. How do we find the column name?
+str(BSAResults)
+unique(BSAResults$CHROM)
+
+# Filter for Chromosome II using dplyr's filter() function, and pipe through head() to output only the first 10 lines
+BSAResults %>%
+  filter(CHROM == "II") %>%
+  head(., n = 10)
+
+# Plot a scatter plot of the Bulk with x-axis being POS and y-axis being Bulk values
+BSAResults %>%
+  filter(CHROM == "II") %>%
+  ggplot(., aes(x = POS, y = Bulk)) +
+  geom_point()
+
+# If we want plot Bulk, Interaction, and Parent for Chr II at once, we need to pivot the data to long format. How do we do so?
+BSAResults %>%
+  pivot_longer(., cols = c(Bulk, Interaction, Parent)) %>%
+  head()
+
+# Then to plot, we can separate our data by "name" - rename this column "Z_score" using pivot_longer()
+BSAResults %>%
+  pivot_longer(., cols = c(Bulk, Interaction, Parent), names_to = "Z_score") %>%
+# There's a more interesting thing happening on Chr VIII. Filter for this instead.
+  filter(CHROM == "VIII") %>%
+# Plot the pivoted points with them colored by Z_score. 
+  ggplot(., aes(x = POS, y = value, color = Z_score)) +
+  geom_point()
+
+# There are a lot of points. Change the opacity of these points.
+BSAResults %>%
+  pivot_longer(., cols = c(Bulk, Interaction, Parent), names_to = "Z_score") %>%
+  filter(CHROM == "VIII") %>%
+  ggplot(., aes(x = POS, y = value, color = Z_score)) +
+  geom_point(alpha = 0.3)
+
+# We now want to change the names to reflect what the value actually is. Add labels to the plot.
+BSAResults %>%
+  pivot_longer(., cols = c(Bulk, Interaction, Parent), names_to = "Z_score") %>%
+  filter(CHROM == "VIII") %>%
+  ggplot(., aes(x = POS, y = value, color = Z_score)) +
+  geom_point(alpha = 0.3) +
+  xlab("Coordinate on Chromsome (nt)") +
+  ylab("Z-Score") +
+  ggtitle("The Light from the Other End of the Tunnel") +
+# A different theme might be better. Let's use theme_classic()
+  theme_classic()
+
+# BONUS: it would be great to plot all chromosomes on the plot at once. Add facet_grid(~CHROM) to do this, and once it works, remove the filtering of your CHROM column.
+BSAResults %>%
+  pivot_longer(., cols = c(Bulk, Interaction, Parent), names_to = "Z_score") %>%
+  # filter(CHROM == "VIII") %>%
+  ggplot(., aes(x = POS, y = value, color = Z_score)) +
+  geom_point(alpha = 0.3, size = 0.1) +
+  xlab("Coordinate on Chromsome (nt)") +
+  ylab("Z-Score") +
+  ggtitle("The One where Everything is Plotted Together") +
+  theme_classic() +
+  facet_grid(~CHROM, space = "free_x") +
+  # NEW: Another way to limit the y
+  coord_cartesian(ylim = c(-1.5, 1.5)) +
+  guides(color = "none")
+```
+
+
+Today, we will be looking into the first figure from
+[Massively parallel Cas13 screens reveal principles for guide RNA design](https://www.nature.com/articles/s41587-020-0456-9) from the Sanjana Lab.
+
+The main reason we selected this paper is because: First, the visualization they
+used are fairly popular and meets what we covered in previous sessions; second,
+they did an excellent job in
+[sharing their data and code](https://gitlab.com/sanjanalab/cas13), so you will
+have this unique chance to work with real data and know exactly how the authors
+performed their analyses and visualization if you take the time to read their
+code.
+
+## Figure 1b: BoxPlot
+
+Figure 1b is a panel of boxplots showing log-transformed enrichment scores of
+different types of crRNAs (the equivalent to sgRNAs for Cas13a).
+
+The processed (normalized and batch-corrected) data for crRNAs in this tiling
+screen is provided in `data/GFP_screen_crRNA_enrichments.csv`. Specifically:
+
+- crRNAs are categorized in to several categories based on their targets in
+`type`
+- Log-transformed enrichment scores are stored in `meanCS.BIN1`
+
+First, let's load in the data and see what it looks like
+
+```{r}
+#Load in our data
+GFP_Results = read.csv("data/GFP_screen_crRNA_enrichments.csv")
+
+#See what the data looks like
+str(GFP_Results)
+
+```
+
+Next we want to change the "type" column into factors. We can do this by using the function factor() which we went over last class, and then add the labels function to change the words into acronyms.
+
+```{r}
+# Note that each type is:
+# 1. Represented as acronyms in the figure
+# 2. Are NOT arranged in alphabetical order
+# We can see the need to transform the type column to a factor
+
+GFP_Results$type = factor(
+  x = GFP_Results$type,
+  levels = c(
+    "Perfect Match",
+    "First Order",
+    "Random Double",
+    "Consecutive Double",
+    "Consecutive Triple",
+    "Non-Targeting"
+  ),
+  labels = c(
+    "PM",
+    "SM",
+    "RD", 
+    "CD",
+    "CT",
+    "NT"
+  )
+)
+```
+
+Next we can make a basic boxplot, using ggplot and filtering for non NA values:
+
+```{r}
+GFP_Results %>%
+  # This is to remove the rows where meanCS.BIN is NA
+  filter(!is.na(meanCS.BIN1)) %>%
+  #basic elements of the plot
+  ggplot(., aes(x = type, y = meanCS.BIN1)) +
+  geom_boxplot() +
+  #labels
+  ggtitle("All crRNAs") +
+  xlab("") +
+  ylab("log2(FC)")
+```
+
+
+First of all, the colors are different. We can change these by setting the hex codes to match the Sanjana lab's colors, then inputting this vector of hex codes into the scale_fill_manual() function:
+
+```{r}
+# The color palette used in the paper
+#### BONUS: Change the colors and run the chunk to see what happens to the
+#### plot!!
+sanjana_colors = c(
+  "#E69F00", "#D55E00", "#009E73", "#0072B2", "#56B4E9", "#999999"
+)
+
+GFP_Results %>%
+  filter(!is.na(meanCS.BIN1)) %>%
+  #basic elements of the plot
+  ggplot(aes(fill = type, x = type, y = meanCS.BIN1)) + geom_boxplot() +
+  #labels
+  xlab("") + ylab("log2(FC)") + ggtitle("All crRNAs") +
+  #colors
+  scale_fill_manual(values = sanjana_colors)
+```
+
+We can also make the outliers smaller, using the outlier.shape and outlier.size functions in geom_boxplot().
+
+```{r}
+GFP_Results %>%
+  filter(!is.na(meanCS.BIN1)) %>%
+  #basic elements of the plot
+  ggplot(aes(fill = type, x = type, y = meanCS.BIN1)) + geom_boxplot(outlier.shape = 20, outlier.size = 0.05) +
+  #labels
+  xlab("") + ylab("log2(FC)") + ggtitle("All crRNAs") +
+  #colors
+  scale_fill_manual(values = sanjana_colors)
+
+```
+Next, let's reduce the white space by adding a ylim argument:
+
+```{r}
+GFP_Results %>%
+  filter(!is.na(meanCS.BIN1)) %>%
+  #basic elements of the plot
+  ggplot(aes(fill = type, x = type, y = meanCS.BIN1)) + geom_boxplot(outlier.shape = 20, outlier.size = 0.05) +
+  #labels
+  xlab("") + ylab("log2(FC)") + ggtitle("All crRNAs") +
+  #colors
+  scale_fill_manual(values = sanjana_colors) +
+  #y axis limits
+  ylim(c(-1.5,1.5)) 
+
+```
+
+Finally, we're going to use a new function called coord_fixed() to restrict the aspect ratio of the plot.
+
+```{r}
+GFP_Results %>%
+  filter(!is.na(meanCS.BIN1)) %>%
+  #basic elements of the plot
+  ggplot(aes(fill = type, x = type, y = meanCS.BIN1)) + geom_boxplot(outlier.shape = 20, outlier.size = 0.05) +
+  #labels
+  xlab("") + ylab("log2(FC)") + ggtitle("All crRNAs") +
+  #colors
+  scale_fill_manual(values = sanjana_colors) +
+  #y-axis limits and ratio
+  ylim(c(-1.5,1.5)) + coord_fixed(ratio = 6/3) +
+  # Remove legends
+    guides(fill = "none") +
+    # Remove x-axis line and tick
+    theme(
+      axis.ticks.x = element_blank(), 
+      axis.line.x = element_blank()
+    )
+
+```
+
+And finally, for a publication-level plot, we'll remove our legend and x axis ticks using guides() and theme(), and then set our overall theme to theme_classic().
+
+```{r}
+GFP_Results %>%
+  filter(!is.na(meanCS.BIN1)) %>%
+  #basic elements of the plot
+  ggplot(aes(fill = type, x = type, y = meanCS.BIN1)) + geom_boxplot(outlier.shape = 20, outlier.size = 0.05) +
+  #labels
+  xlab("") + ylab("log2(FC)") + ggtitle("All crRNAs") +
+  #colors
+  scale_fill_manual(values = sanjana_colors) +
+  #y axis limits and ratio
+  ylim(c(-1.5,1.5)) + coord_fixed(ratio = 6/3) +
+  # Remove legends
+  guides(fill = "none") +
+  theme_classic() +
+  # Remove x-axis line and tick
+    theme(
+      axis.ticks.x = element_blank(), 
+      axis.line.x = element_blank()
+    )
+
+```
+
+###############################################################################
+
+## Figure 1c: Scatter plot with jitter
+
+Figure 1c is a panel of scatter plots with jitter showing differences in 
+log-transformed enrichment scores of individual crRNAs of different types.
+
+The processed data for individual crRNAs is provided in
+`data/GFPTiling_individual.csv`. Specifically:
+
+- crRNAs are categorized in to several categories based on their targets in
+`MatchType`
+- Differences of log-transformed enrichment scores are stored in `DeltaCS`
+
+
+```{r}
+# Load data
+tiling_result = read.csv("data/GFPTiling_individual.csv")
+
+# Take a look at your data
+str(tiling_result)
+
+#Find the unique values for your MatchType column
+unique(tiling_result$MatchType)
+
+# Make MatchType a factor
+tiling_result$MatchType = factor(
+  x = tiling_result$MatchType,
+  levels = c(
+    "Perfect Match",
+    "First Order",
+    "Random Double",
+    "Consecutive Double",
+    "Consecutive Triple"
+  ),
+  labels = c(
+    "PM",
+    "SM",
+    "RD", 
+    "CD",
+    "CT"
+  )
+)
+
+```
+
+
+Next, let's make the basic ggplot for the tiling result, with MatchType on the x axis, DeltaCS on the y axis, and colored points by MatchType. You'll want to use geom_jitter() rather than geom_point(), with a width of 0.2, a size of 3, and a shape of 20.
+
+```{r}
+tiling_result %>%
+#Filter out the NAs in the DeltaCS column
+  filter(!is.na(DeltaCS)) %>%
+#Make your ggplot scatter plot here
+  ggplot(., aes(x = MatchType, y = DeltaCS, color = MatchType)) +
+  geom_jitter()
+```
+
+We'll add horizontal lines using the new function stat_summary(), which provides plotting of simple summary statistics. First, let's look up the documentation for stat_summary().
+
+```{r, eval = FALSE}
+#What is the other way to find the help menu?
+?stat_summary
+
+```
+
+Let's go ahead and use stat_summary, finding the median of each group:
+
+```{r}
+tiling_result %>%
+  filter(!is.na(DeltaCS)) %>%
+  ggplot(aes(x = MatchType, y = DeltaCS, color = MatchType)) +
+    geom_jitter(
+      # Do you notice several things are different from your plot above
+      # and the real one in the paper?
+      # The size of the points and how wide they spread/jitter are the most
+      # obvious to me, so we are fixing those here.
+      width = 0.2,size = 3,shape = 20
+    ) +
+  
+    # Add a horizontal bar at the median of each group
+    # NEW FUNCTION!! stat_summary() provides plotting of simple summary
+    # statistics (defined by fun (function to summarize each group)) with several
+    # types of plots (defined by geom)
+    stat_summary(
+      fun = median,
+      geom = "crossbar",
+      width = 0.5,
+      color = "black"
+    ) 
+```
+
+
+Next, we can scale our y axis continuously, as follows:
+
+```{r}
+tiling_result %>%
+  filter(!is.na(DeltaCS)) %>%
+  ggplot(aes(x = MatchType, y = DeltaCS, color = MatchType)) +
+    geom_jitter(width = 0.2,size = 3,shape = 20) +
+    stat_summary(fun = median,geom = "crossbar",width = 0.5, color = "black") + 
+  
+  #scaling function
+    scale_y_continuous(limits = c(-2, 0.5), breaks = c(seq(-2, 0)))
+  
+
+```
+
+To finish up this plot, we'll want to set the following arguments. With a partner, add these to your plot: 
+
+- title your plot "Individual crRNA"
+- remove the x axis label
+- set the y axis label to "delta log2(FC)"
+- set the coordinate ratio to 7/3.5
+- set the colors to sanajana colors as we did before (note that this time the function has to be scale_color_manual rather than scale_fill_manual)
+- Remove x-axis line and tick as we did before
+
+```{r}
+# Your publication-ready plot here
+tiling_result %>%
+  filter(!is.na(DeltaCS)) %>%
+  ggplot(aes(x = MatchType, y = DeltaCS, color = MatchType)) +
+  geom_jitter(width = 0.2,size = 3,shape = 20) +
+  stat_summary(fun = median,geom = "crossbar",width = 0.5, color = "black") + 
+  
+  #scaling function
+  scale_y_continuous(limits = c(-2, 0.5), breaks = c(seq(-2, 0))) +
+  scale_color_manual(values = sanjana_colors) +
+  coord_fixed(ratio = 7/3.5) +
+  # Set axis labels
+  xlab("") +
+  ylab("Delta log2(FC)") +
+  ggtitle("Individual crRNAs") +
+  theme_classic() +
+  theme(
+    axis.line.x = element_blank(),
+    axis.ticks.x = element_blank()
+  ) +
+  guides(color = "none")
+
+```
+
+
+
+###############################################################################
+
+## Figure 1d: Scatter plot with a smooth line
+
+Figure 1d is a panel of scatter plots with a smooth line for enrichment scores
+of individual crRNAs targeting different regions of the GFP transcript.
+
+The processed data for individual crRNAs that target GFP is provided in
+`data/GFPTiling_individual_full.csv`. Specifically:
+
+- Log-transformed enrichment scores are stored in `meanCS`
+- The points are plotted over the GFP transcripts, and the coordinates of
+matching site is in `MatchPos`
+- The points were colored by which quantile it falls into.
+
+Quantile is just binning values into four bins, and `dplyr` has another
+function to determine *which quantile a row belongs to by a numeric column
+of your choice, and the syntax is `ntile(column, number_of_bins)`.
+
+A minimal example of its usage is:
+
+```{r}
+exdf = data.frame(
+  value = 1:10
+)
+
+
+exdf %>% mutate(
+  split_at_median = ntile(value, 2),
+  quantile = ntile(value, 4)
+)
+```
+
+
+Please observe the figure and propose your way of reproducing the panel. The
+colors they used are provided in the chunk below:
+
+
+```{r}
+gfp_color = c('#ca0020','#f4a582','#92c5de','#0571b0')
+```
+
+```{r}
+# Load data
+allGFP = read.csv("data/GFPTiling_individual_full.csv")
+```
+
+```{r}
+# Use qtile() within mutate to create our data frame
+allGFP %>%
+  filter(!is.na(meanCS)) %>%
+  # Assign quartile (split into 4 proportions) by meanCS
+  # Since we are going to color by quartile, it is preferable to use factor
+  # than numerics
+  mutate(qtile = as.factor(ntile(meanCS, 4))) %>% head(20)
+```
+
+```{r}
+ allGFP %>%
+  filter(!is.na(meanCS)) %>%
+  mutate(qtile = as.factor(ntile(meanCS, 4))) %>%
+  # Pipe into ggplot and define the columns used for axes and color
+  ggplot(aes(x = MatchPos, y = meanCS, color = qtile)) +
+  # Plot a smooth line by the scatter points you provided 
+  geom_smooth(
+    # There are multiple ways to get a line from points
+    # Here, we use "locally estimated scatter plot smoothing"
+    method = "loess",
+    # which fits a polynomial function (curve line) within a small window
+    # whose size is defined by span
+    span = 0.05,
+    # The color of the smooth line
+    color = "black",
+    # The size of the smooth line
+    size = 0.5,
+    # The color of the shaded area representing the standard error of
+    # the smoothing method you picked
+    fill = "grey77"
+  ) 
+
+```
+
+Then of course we can add the points, colored by their qtile scores
+
+```{r}
+allGFP %>%
+  filter(!is.na(meanCS)) %>%
+  mutate(qtile = as.factor(ntile(meanCS, 4))) %>%
+  ggplot(aes(x = MatchPos, y = meanCS, color = qtile)) +
+  geom_smooth(method = "loess", span = 0.05, color = "black", size = 0.5, fill = "grey77") +
+  geom_point(shape = 20)
+```
+
+```{r}
+allGFP %>%
+  filter(!is.na(meanCS)) %>%
+  mutate(qtile = as.factor(ntile(meanCS, 4))) %>%
+  ggplot(aes(x = MatchPos, y = meanCS, color = qtile)) +
+  geom_smooth(method = "loess", span = 0.05, color = "black", size = 0.5, fill = "grey77") +
+  geom_point(shape = 20) +
+  # Use classic theme
+  theme_classic() +
+  # Remove color legend
+  guides(color = "none") +
+  # Set the ticks and limits of x and y axes
+  scale_x_continuous(
+    limits = c(-50, 750),
+    breaks = seq(0, 750, 100),
+  ) +
+  scale_y_continuous(
+    limits = c(-1, 1.5),
+    breaks = seq(-1, 1.5, 1),
+  ) +
+  # Set axis titles
+  xlab("Position in GFP transcript (nt)") +
+  ylab("log2(FC)") +
+  # Set aspect ratio
+  coord_fixed(ratio = 200/3) +
+  # Set a customized color palette
+  scale_color_manual(values = gfp_color) 
+```
+
+Many, many annotations are added here. This adds each individual box. Run the following code, and then try changing the Q1 box to say 1Q instead.
+
+```{r}
+allGFP %>%
+  filter(!is.na(meanCS)) %>%
+  mutate(qtile = as.factor(ntile(meanCS, 4))) %>%
+  ggplot(aes(x = MatchPos, y = meanCS, color = qtile)) +
+  geom_smooth(method = "loess", span = 0.05, color = "black", size = 0.5, fill = "grey77") +
+  geom_point(shape = 20) +
+  # Use classic theme
+  theme_classic() +
+  # Remove color legend
+  guides(color = "none") +
+  # Set the ticks and limits of x and y axes
+  scale_x_continuous(
+    limits = c(-50, 750),
+    breaks = seq(0, 750, 100),
+  ) +
+  scale_y_continuous(
+    limits = c(-1, 1.5),
+    breaks = seq(-1, 1.5, 1),
+  ) +
+  # Set axis titles
+  xlab("Position in GFP transcript (nt)") +
+  ylab("log2(FC)") +
+  # Set aspect ratio
+  coord_fixed(ratio = 200/3) +
+  # Set a customized color palette
+  scale_color_manual(values = gfp_color) +
+  
+  
+  # Extra annotations -- these are done manually here.
+  # The authors wrote a function for this, which is the preferred way:
+  # https://gitlab.com/sanjanalab/cas13/-/blob/master/scripts/Plot_GuideScoreDistributionPerGene.R#L140
+  # If you really want to fully recapitulate the figure, this is what you need.
+  # But manually annotating one figure is pretty tedious as you see below.
+  annotate(
+    geom = "rect",
+    # xmin and xmax (and x for the text geom should be computed as a function)
+    # This is basically the length of each exons in the transcript
+    xmin = 0,
+    xmax = 750,
+    # These are fixed for the transcript plot
+    ymin = -1,
+    ymax = -0.8,
+    color = "grey50",
+    fill = "lightblue",
+    alpha = 0.5
+  ) +
+  annotate(
+    # This labels the exon number
+    geom = "text",
+    x = 750/2,
+    y = -0.9,
+    label = "1",
+    size = 2,
+    color = "black"
+  ) +
+  annotate(
+    # The following labels the range of each quartile
+    geom = "rect",
+    # The x range is fixed
+    xmin = -50,
+    xmax = -10,
+    # ymin, ymax, and y for the text geom should be computed if a function
+    # is to be written
+    ymin = min(allGFP$meanCS, na.rm = TRUE),
+    ymax = quantile(allGFP$meanCS, 0.25, na.rm = TRUE),
+    fill = gfp_color[1],
+    alpha = 0.3
+  ) +
+  annotate(
+    geom = "text",
+    x = -30,
+    y = 
+      (min(allGFP$meanCS, na.rm = TRUE) + quantile(allGFP$meanCS, 0.25, na.rm = TRUE))/2,
+    label = "Q1",
+    size = 4
+  ) +
+  annotate(
+    geom = "rect",
+    xmin = -50,
+    xmax = -10,
+    ymin = quantile(allGFP$meanCS, 0.25, na.rm = TRUE),
+    ymax = quantile(allGFP$meanCS, 0.5, na.rm = TRUE),
+    fill = gfp_color[2],
+    alpha = 0.3
+  ) +
+  annotate(
+    geom = "text",
+    x = -30,
+    y = 
+      (quantile(allGFP$meanCS, 0.25, na.rm = TRUE) + quantile(allGFP$meanCS, 0.5, na.rm = TRUE))/2,
+    label = "Q2",
+    size = 4
+  ) +
+  annotate(
+    geom = "rect",
+    xmin = -50,
+    xmax = -10,
+    ymin = quantile(allGFP$meanCS, 0.5, na.rm = TRUE),
+    ymax = quantile(allGFP$meanCS, 0.75, na.rm = TRUE),
+    fill = gfp_color[3],
+    alpha = 0.3
+  ) +
+  annotate(
+    geom = "text",
+    x = -30,
+    y = 
+      (quantile(allGFP$meanCS, 0.5, na.rm = TRUE) + quantile(allGFP$meanCS, 0.75, na.rm = TRUE))/2,
+    label = "Q3",
+    size = 4
+  ) +
+  annotate(
+    geom = "rect",
+    xmin = -50,
+    xmax = -10,
+    ymin = quantile(allGFP$meanCS, 0.75, na.rm = TRUE),
+    ymax = max(allGFP$meanCS, na.rm = TRUE),
+    fill = gfp_color[4],
+    alpha = 0.3
+  ) +
+  annotate(
+    geom = "text",
+    x = -30,
+    y = 
+      (quantile(allGFP$meanCS, 0.75, na.rm = TRUE) + max(allGFP$meanCS, na.rm = TRUE))/2,
+    label = "Q4",
+    size = 4
+  )
+```
+
