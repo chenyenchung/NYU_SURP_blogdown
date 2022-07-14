@@ -1,0 +1,315 @@
+---
+title: ggplot2 and dplyr
+date: '2022-07-07'
+slug: ggplot2-and-dplyr
+categories:
+  - Handout
+tags: []
+subtitle: ''
+summary: ''
+authors: ['cb']
+lastmod: '2022-07-14T16:58:07-04:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+
+
+<div id="review" class="section level2">
+<h2>Review</h2>
+<p>A quick review before we get into more complicated exercises:</p>
+<pre class="r"><code>#Load in your data
+penguins &lt;- read.csv(&quot;penguins.csv&quot;)
+
+#Look at the column names and types of your data using str()
+str(penguins)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    344 obs. of  8 variables:
+##  $ species          : chr  &quot;Adelie&quot; &quot;Adelie&quot; &quot;Adelie&quot; &quot;Adelie&quot; ...
+##  $ island           : chr  &quot;Torgersen&quot; &quot;Torgersen&quot; &quot;Torgersen&quot; &quot;Torgersen&quot; ...
+##  $ bill_length_mm   : num  39.1 39.5 40.3 NA 36.7 39.3 38.9 39.2 34.1 42 ...
+##  $ bill_depth_mm    : num  18.7 17.4 18 NA 19.3 20.6 17.8 19.6 18.1 20.2 ...
+##  $ flipper_length_mm: int  181 186 195 NA 193 190 181 195 193 190 ...
+##  $ body_mass_g      : int  3750 3800 3250 NA 3450 3650 3625 4675 3475 4250 ...
+##  $ sex              : chr  &quot;male&quot; &quot;female&quot; &quot;female&quot; NA ...
+##  $ year             : int  2007 2007 2007 2007 2007 2007 2007 2007 2007 2007 ...</code></pre>
+<pre class="r"><code>#Make a scatter plot of *body mass* and *bill depth*
+ggplot(penguins, aes(x = body_mass_g, y = bill_depth_mm)) + geom_point()</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>#Make a density plot of body mass with a fill color changing by sex and a transparency of 0.4
+ggplot(penguins, aes(x = body_mass_g, fill = sex)) + geom_density(alpha = 0.4)</code></pre>
+<pre><code>## Warning: Removed 2 rows containing non-finite values (stat_density).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<pre class="r"><code>#Name the density plot above using ggtitle()
+ggplot(penguins, aes(x = body_mass_g, fill = sex)) + geom_density(alpha = 0.4) + ggtitle(&quot;Body Mass by Sex&quot;)</code></pre>
+<pre><code>## Warning: Removed 2 rows containing non-finite values (stat_density).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-2-3.png" width="672" /></p>
+<div id="practice-exercise" class="section level3">
+<h3>Practice Exercise</h3>
+<p>With a partner, let’s make a scatter plot and two density plots of two numeric variables; make one scatter plot looking at the correlation between the two, and then a density plot for each variable that you choose. Color based on a categorical variable.</p>
+<pre class="r"><code># Use head() or str() to find the variables that are numeric
+str(penguins)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    344 obs. of  8 variables:
+##  $ species          : chr  &quot;Adelie&quot; &quot;Adelie&quot; &quot;Adelie&quot; &quot;Adelie&quot; ...
+##  $ island           : chr  &quot;Torgersen&quot; &quot;Torgersen&quot; &quot;Torgersen&quot; &quot;Torgersen&quot; ...
+##  $ bill_length_mm   : num  39.1 39.5 40.3 NA 36.7 39.3 38.9 39.2 34.1 42 ...
+##  $ bill_depth_mm    : num  18.7 17.4 18 NA 19.3 20.6 17.8 19.6 18.1 20.2 ...
+##  $ flipper_length_mm: int  181 186 195 NA 193 190 181 195 193 190 ...
+##  $ body_mass_g      : int  3750 3800 3250 NA 3450 3650 3625 4675 3475 4250 ...
+##  $ sex              : chr  &quot;male&quot; &quot;female&quot; &quot;female&quot; NA ...
+##  $ year             : int  2007 2007 2007 2007 2007 2007 2007 2007 2007 2007 ...</code></pre>
+<pre class="r"><code># Make a scatter plot of the two variables using geom_point()
+# Add a color to separate the categorical variable
+penguins %&gt;%
+  ggplot(., aes(x = bill_length_mm, y = body_mass_g, color = island)) +
+  geom_point() +
+# Add axis labels and a title to your plot
+  xlab(&quot;Bill Length (mm)&quot;) +
+  ylab(&quot;Body Mass (g)&quot;) +
+  ggtitle(&quot;Does a heavier penguin have a longer bill?&quot;)</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code>#Make a density plot using geom_density()
+penguins %&gt;%
+  ggplot(., aes(x = bill_length_mm, color = island)) +
+  geom_density() +
+# Add axis labels and a title to your plot using ggtitle(), xlab(), and ylab()
+  xlab(&quot;Bill Legnth (mm)&quot;) +
+  ylab(&quot;Density&quot;) +
+  ggtitle(&quot;Density distribution&quot;)</code></pre>
+<pre><code>## Warning: Removed 2 rows containing non-finite values (stat_density).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
+<pre class="r"><code># Share with the class which variables you chose and what your plots looked like</code></pre>
+</div>
+</div>
+<div id="using-dplyr-to-pipe-into-plotting" class="section level2">
+<h2>Using Dplyr to pipe into plotting</h2>
+<p>So far we’ve included into ggplot() the arguments for data and columns, but we can also use dplyr to pipe. In dplyr, the argument being used is often referred to as ‘.’, so using this can allow you to substitute based on your other pipeline arguments.</p>
+<pre class="r"><code>penguins %&gt;%
+  ggplot(data = .,aes(x = body_mass_g, color = species)) +
+  geom_density(size = 2)</code></pre>
+<pre><code>## Warning: Removed 2 rows containing non-finite values (stat_density).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>penguins %&gt;%
+  filter(species == &quot;Adelie&quot;) %&gt;%
+  ggplot(data = .,aes(x = body_mass_g, color = species)) +
+  geom_density(size = 2)</code></pre>
+<pre><code>## Warning: Removed 1 rows containing non-finite values (stat_density).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+<div id="omitting-nas" class="section level3">
+<h3>Omitting NAs</h3>
+<p>We can also use the dplyr function na.omit() to remove the NAs in our dataset before plotting.</p>
+<pre class="r"><code>#Original graph
+penguins %&gt;% 
+  ggplot(., aes(x = body_mass_g, fill = sex)) + 
+  geom_density(alpha = 0.4) + 
+  ggtitle(&quot;Body Mass by Sex&quot;)</code></pre>
+<pre><code>## Warning: Removed 2 rows containing non-finite values (stat_density).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>#New graph
+penguins %&gt;% 
+  na.omit() %&gt;% 
+  ggplot(., aes(body_mass_g, fill = sex)) + 
+  geom_density(alpha = 0.4) + 
+  ggtitle(&quot;Body Mass by Sex&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+</div>
+<div id="practice" class="section level3">
+<h3>Practice</h3>
+<pre class="r"><code># Using piping, filter to only the female Adelie penguins and plot their bill length vs bill depth
+#Color this plot by island
+penguins %&gt;%
+  filter(species == &quot;Adelie&quot;, sex == &quot;female&quot;) %&gt;%
+  ggplot(., aes(x = bill_length_mm, y = bill_depth_mm, color = island)) +
+  geom_point()</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code># Change the size to be 3 and the transparency of your points to 0.5
+penguins %&gt;%
+  filter(species == &quot;Adelie&quot;, sex == &quot;female&quot;) %&gt;%
+  ggplot(., aes(x = bill_length_mm, y = bill_depth_mm, color = island)) +
+  geom_point(size = 3, alpha = 0.5)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-6-2.png" width="672" /></p>
+<pre class="r"><code># Label your plot and include a title
+penguins %&gt;%
+  filter(species == &quot;Adelie&quot;, sex == &quot;female&quot;) %&gt;%
+  ggplot(., aes(x = bill_length_mm, y = bill_depth_mm, color = island)) +
+  geom_point(size = 3, alpha = 0.5) +
+  xlab(&quot;Bill Length (mm)&quot;) +
+  ylab(&quot;Bill Depth (mm)&quot;) +
+  ggtitle(&quot;I ♥ Adelie Penguins&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-6-3.png" width="672" /></p>
+</div>
+</div>
+<div id="bar-plots" class="section level2">
+<h2>Bar Plots</h2>
+<p>We’ve mostly looked at numeric data; but what about using categorical data on our x or y axis? Bar plots are one way to look at this, and they have multiple functions for a bar-like graph. Here we’ll go through a few</p>
+<div id="counts" class="section level3">
+<h3>Counts</h3>
+<pre class="r"><code>#To count the number of individuals
+penguins %&gt;% ggplot(., aes(x = species)) + geom_bar()</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code>#Adding in color to separate by sex
+penguins %&gt;% ggplot(., aes(x = species, fill = sex)) + geom_bar()</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
+<pre class="r"><code>#Changing the position to 
+penguins %&gt;% na.omit() %&gt;% ggplot(., aes(x = species, fill = sex)) + geom_bar(position = &quot;dodge&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-7-3.png" width="672" /></p>
+</div>
+<div id="values" class="section level3">
+<h3>Values</h3>
+<p>Instead of the automatic counts that we get in geom_bar(), we can use geom_col() to produce <em>columns</em> that represent the measure of choice. Keep in mind that bar graphs of either type will start at 0, and so the scale might not be a good representation of differences. Since it is possible to change the y axis, keep in mind that you should almost NEVER do this on a bar plot because it looks misleading and enhances the differences in disproportionate ways. Other plots are better suited.</p>
+<pre class="r"><code>penguins %&gt;% na.omit() %&gt;% group_by(species) %&gt;% summarize(mean_bill = mean(bill_length_mm)) %&gt;% ggplot(., aes(x = species, y = mean_bill)) + geom_col()</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<pre class="r"><code>penguins %&gt;% na.omit() %&gt;% group_by(year, species) %&gt;% summarize(mean = mean(bill_length_mm)) %&gt;% ggplot(., aes(x = year, fill = species, y = mean)) + geom_col(position = &quot;dodge&quot;)</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;year&#39;. You can override using the
+## `.groups` argument.</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-8-2.png" width="672" /></p>
+</div>
+<div id="practice-1" class="section level3">
+<h3>Practice</h3>
+<p>Try plotting the number of penguins on each island with a fill color by sex.</p>
+<pre class="r"><code>#Use geom_bar() to plot the counts
+penguins %&gt;%
+  na.omit() %&gt;%
+  ggplot(., aes(x = island, fill = sex)) +
+  geom_bar(position = &quot;dodge&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>Next, plot the mean flipper length of each species, colored by sex</p>
+<pre class="r"><code>#Find the average flipper length by grouping by species and sex, then summarizing
+penguins %&gt;%
+  group_by(species, sex) %&gt;%
+  na.omit() %&gt;%
+  summarize(mean_flipper_length = mean(flipper_length_mm)) %&gt;%
+#Use geom_col() to plot the average flipper length
+  ggplot(., aes( x = species, y = mean_flipper_length, fill = sex)) +
+  geom_col(position = &quot;dodge&quot;)</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;species&#39;. You can override using the
+## `.groups` argument.</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+</div>
+</div>
+<div id="boxplots" class="section level2">
+<h2>Boxplots</h2>
+<p>We often want to plot the statistics of our graphs, and box plots are one easy way to show the quantiles without doing a ton of work on adding error bars (which have more settings to include). The function is geom_boxplot().</p>
+<pre class="r"><code>#The basic plot structure
+penguins %&gt;% ggplot(., aes(x = species, y = flipper_length_mm)) + geom_boxplot()</code></pre>
+<pre><code>## Warning: Removed 2 rows containing non-finite values (stat_boxplot).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<pre class="r"><code>#Can you add in color by species? What happens if you color by sex?
+penguins %&gt;% ggplot(., aes(x = species, y = flipper_length_mm, color = species)) + geom_boxplot()</code></pre>
+<pre><code>## Warning: Removed 2 rows containing non-finite values (stat_boxplot).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-11-2.png" width="672" /></p>
+<pre class="r"><code>penguins %&gt;% ggplot(., aes(x = species, y = flipper_length_mm, color = sex)) + geom_boxplot()</code></pre>
+<pre><code>## Warning: Removed 2 rows containing non-finite values (stat_boxplot).</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-11-3.png" width="672" /></p>
+<div id="practice-2" class="section level3">
+<h3>Practice</h3>
+<p>Change the above graph to remove NAs.</p>
+<pre class="r"><code>penguins %&gt;%
+  na.omit() %&gt;%
+  ggplot(., aes(x = species, y = flipper_length_mm, color = sex)) + geom_boxplot()</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>Plot the bill length instead of the flipper length.</p>
+<pre class="r"><code>penguins %&gt;%
+  na.omit() %&gt;%
+  ggplot(., aes(x = species, y = bill_length_mm, color = sex)) + geom_boxplot()</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+</div>
+</div>
+<div id="exercises-with-new-data" class="section level2">
+<h2>Exercises with new data</h2>
+<p>Let’s load a new csv to practice our plotting. This is from Cassandra’s data, and includes chromosomes, positions, and reads.</p>
+<pre class="r"><code>BSA_Reads &lt;- read.csv(&quot;BSA_Reads.csv&quot;)</code></pre>
+<pre class="r"><code>#Look at the structure of iris to find what the options are for column names
+str(BSA_Reads)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    398312 obs. of  11 variables:
+##  $ X     : int  1 2 3 4 5 6 7 8 9 10 ...
+##  $ CHROM : chr  &quot;I&quot; &quot;I&quot; &quot;I&quot; &quot;I&quot; ...
+##  $ POS   : int  100007 100007 100007 100007 100007 100007 100007 100007 1035 1035 ...
+##  $ value : int  867 590 815 160 86 189 322 43 137 99 ...
+##  $ allele: chr  &quot;ALT&quot; &quot;REF&quot; &quot;ALT&quot; &quot;REF&quot; ...
+##  $ bulk  : chr  &quot;HIGH&quot; &quot;LOW&quot; &quot;LOW&quot; &quot;LOW&quot; ...
+##  $ parent: chr  &quot;Wine&quot; &quot;Oak&quot; &quot;Wine&quot; &quot;Wine&quot; ...
+##  $ REF   : chr  &quot;AT&quot; &quot;AT&quot; &quot;AT&quot; &quot;AT&quot; ...
+##  $ Wine  : chr  &quot;A&quot; &quot;A&quot; &quot;A&quot; &quot;A&quot; ...
+##  $ Oak   : chr  NA NA NA NA ...
+##  $ Type  : chr  &quot;Wine&quot; &quot;Wine&quot; &quot;Wine&quot; &quot;Wine&quot; ...</code></pre>
+<pre class="r"><code>#What is the distribution of values? Use geom_density()
+BSA_Reads %&gt;%
+  ggplot(., aes(x = value)) +
+  geom_density()</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<pre class="r"><code># How does the distribution differ with respect to parent? Use geom_density() but color by parent.
+BSA_Reads %&gt;%
+  ggplot(., aes(x = value, color = parent)) +
+  geom_density()</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-15-2.png" width="672" /></p>
+<p>Let’s look at the average number of reads (value) for each bulk, colored by parent</p>
+<pre class="r"><code># First, group by your bulk and parent
+BSA_Reads %&gt;%
+  group_by(bulk, parent) %&gt;%
+#Next, use summarize to find the mean of the value
+  summarize(avg_value = mean(value)) %&gt;%
+#Finally, plot using geom_col() with bulk as your x axis label, y as the mean of your reads, and a fill color of the parent
+  ggplot(., aes(x = bulk, y = avg_value, fill = parent)) +
+  geom_col() +
+  xlab(&quot;Bulk&quot;) +
+  ylab(&quot;Mean of Reads&quot;)</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;bulk&#39;. You can override using the
+## `.groups` argument.</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<pre class="r"><code># Separate your plot so that the position is dodge (so that the bars are next to each other)
+BSA_Reads %&gt;%
+  group_by(bulk, parent) %&gt;%
+#Next, use summarize to find the mean of the value
+  summarize(avg_value = mean(value)) %&gt;%
+#Finally, plot using geom_col() with bulk as your x axis label, y as the mean of your reads, and a fill color of the parent
+  ggplot(., aes(x = bulk, y = avg_value, fill = parent)) +
+  geom_col(position = &quot;dodge&quot;) +
+  xlab(&quot;Bulk&quot;) +
+  ylab(&quot;Mean of Reads&quot;)</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;bulk&#39;. You can override using the
+## `.groups` argument.</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-16-2.png" width="672" /></p>
+<p>Finally, let’s look at the average value per chromosome, and the number of reads per chromosome.</p>
+<pre class="r"><code>#Use a boxplot to look at the values for each chromosome. Your x should be CHROM and y should be value.
+BSA_Reads %&gt;%
+  ggplot(., aes(x = CHROM, y = value)) +
+  geom_boxplot()</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<pre class="r"><code>#Use geom_bar() for the number of entries for each chromosome. In this case you only need x to be CHROM since geom_bar() will count for you.
+BSA_Reads %&gt;%
+  ggplot(., aes(x = CHROM)) +
+  geom_bar()</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-17-2.png" width="672" /></p>
+</div>
+<div id="bonus-factors" class="section level2">
+<h2>Bonus: Factors</h2>
+<p>The graphs of chromosomes are out of order, partially because they’re characters which are ordered alphabetically. However, Roman numerals don’t follow alphabetical order, so we can instead turn this column into a <em>factor</em>.</p>
+<p>Factors have “levels” which determine their order. We can define this using factor(), just as we switched between numbers and characters.</p>
+<pre class="r"><code>BSA_Reads$CHROMf &lt;- factor(BSA_Reads$CHROM, 
+                             levels = c(&quot;I&quot;, &quot;II&quot;, &quot;III&quot;, &quot;IV&quot;, &quot;V&quot;, &quot;VI&quot;, &quot;VII&quot;, &quot;VIII&quot;, 
+                                        &quot;IX&quot;, &quot;X&quot;, &quot;XI&quot;, &quot;XII&quot;, &quot;XIII&quot;, &quot;XIV&quot;, &quot;XV&quot;, &quot;XVI&quot;))
+
+str(BSA_Reads)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    398312 obs. of  12 variables:
+##  $ X     : int  1 2 3 4 5 6 7 8 9 10 ...
+##  $ CHROM : chr  &quot;I&quot; &quot;I&quot; &quot;I&quot; &quot;I&quot; ...
+##  $ POS   : int  100007 100007 100007 100007 100007 100007 100007 100007 1035 1035 ...
+##  $ value : int  867 590 815 160 86 189 322 43 137 99 ...
+##  $ allele: chr  &quot;ALT&quot; &quot;REF&quot; &quot;ALT&quot; &quot;REF&quot; ...
+##  $ bulk  : chr  &quot;HIGH&quot; &quot;LOW&quot; &quot;LOW&quot; &quot;LOW&quot; ...
+##  $ parent: chr  &quot;Wine&quot; &quot;Oak&quot; &quot;Wine&quot; &quot;Wine&quot; ...
+##  $ REF   : chr  &quot;AT&quot; &quot;AT&quot; &quot;AT&quot; &quot;AT&quot; ...
+##  $ Wine  : chr  &quot;A&quot; &quot;A&quot; &quot;A&quot; &quot;A&quot; ...
+##  $ Oak   : chr  NA NA NA NA ...
+##  $ Type  : chr  &quot;Wine&quot; &quot;Wine&quot; &quot;Wine&quot; &quot;Wine&quot; ...
+##  $ CHROMf: Factor w/ 16 levels &quot;I&quot;,&quot;II&quot;,&quot;III&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...</code></pre>
+<p>Now, let’s plot this new variable as our x-axis.</p>
+<pre class="r"><code>BSA_Reads %&gt;% ggplot(., aes(x = CHROMf)) + geom_bar()</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+</div>

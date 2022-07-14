@@ -69,6 +69,24 @@
   url = "assets/session7.zip"
   
 [[main]]
+  name = "Session 8"
+  weight = 80
+  parent = "wsd"
+  url = "assets/session8.zip"
+  
+[[main]]
+  name = "Session 9"
+  weight = 90
+  parent = "wsd"
+  url = "assets/session9.zip"
+
+[[main]]
+  name = "Session 10"
+  weight = 100
+  parent = "wsd"
+  url = "assets/session10.zip"
+  
+[[main]]
   name = "Slide Deck"
   weight = 40
   identifier = "slides"
